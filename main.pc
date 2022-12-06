@@ -1,0 +1,326 @@
+// 마지막고침 : 2020.11.17
+// win32 Visual C 2010 이상컴파일시 추가
+// 프로그램 가장 첫 줄에 추가할 것
+#define _CRT_SECURE_NO_WARNINGS
+//-----------------------------------------
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+#include <conio.h>
+
+/* for oracle */
+#include <sqlda.h>
+#include <sqlca.h>
+#include <sqlcpr.h>
+
+// win32 Visual C 2010 이상컴파일시 추가
+#define getch() _getch()
+//-----------------------------------------
+
+/*--------------- 화면 커서 위치 제어 ------------------------*/
+#include < windows.h >
+void gotoxy(int x, int y);
+void getxy(int *x, int *y);
+void clrscr(void);
+/*-----------------------------------------------------------*/
+void print_screen(char fname[]);
+void DB_connect();
+void Get_tuple();
+void startProcess();
+void login();
+void signup();
+
+void sql_error();
+void signup_error();
+
+#define getch() _getch()
+
+#define SUCCESS 0 // 정상적으로 처리된 경우
+#define NOTFOUND 1403 // 조회된 데이터가 없다는 의미
+#define NOINSERT 100 // INSERT된 데이터가 없다는 의미.(단 컴파일 옵션이 MODE=ANSI 일때)
+
+EXEC SQL BEGIN DECLARE SECTION;
+VARCHAR uid[80];
+VARCHAR pwd[20];
+EXEC SQL END DECLARE SECTION;
+
+void main()
+{
+    _putenv("NLS_LANG=American_America.KO16KSC5601"); //한글사용
+
+    DB_connect();
+    startProcess();
+
+    EXEC SQL COMMIT WORK RELEASE;
+
+    getch();
+}
+
+void DB_connect()
+{
+    strcpy((char *)uid.arr, "a20183188@//sedb.deu.ac.kr:1521/orcl");
+    uid.len = (short)strlen((char *)uid.arr);
+    strcpy((char *)pwd.arr, "20183188");
+    pwd.len = (short)strlen((char *)pwd.arr);
+
+    EXEC SQL CONNECT : uid IDENTIFIED BY : pwd;
+
+    // connection이 실패했을경우의 처리부분
+
+    if (sqlca.sqlcode != 0 && sqlca.sqlcode != -1405)
+    {
+        printf("Connect error: %s", sqlca.sqlerrm.sqlerrmc);
+        getch();
+        exit(-1);
+    }
+
+    printf("Oracle Connect SUCCESS by %s\n", uid.arr);
+}
+
+/**
+ * 화면 출력 함수
+ */
+void print_screen(char fname[])
+{
+    FILE *fp;
+    char line[100];
+
+    if ((fp = fopen(fname, "r")) == NULL)
+    {
+        printf("file open error\n");
+        getch();
+        exit(-1);
+    }
+    while (1)
+    {
+        if (fgets(line, 99, fp) == NULL)
+        {
+            break;
+        }
+        printf("%s", line);
+    }
+
+    fclose(fp);
+}
+
+/**
+ * 처음 시작되는 화면
+ */
+void startProcess(){
+    clrscr();
+    print_screen("main_screen.txt");
+    gotoxy(33, 13);
+
+    char input = getch();
+
+    if(input == '1'){ // 로그인을 선택한 경우
+        login();
+    } else if(input == '2'){ // 회원가입을 선택한 경우
+        signup();
+    }
+}
+
+/**
+ * 회원가입 함수
+ */
+void signup(){
+    clrscr();
+    print_screen("signup_screen.txt");
+
+    gotoxy(35, 14);
+
+    /**
+    * Register sql_error() as the error handler. 
+    * DO 뒤에 error시 처리할 handler 함수를 작성 -> 여기서 에러를 캐치해버리면 sqlcode는 무조건 0이 나와버림(?)
+    */
+    EXEC SQL WHENEVER SQLERROR DO signup_error();
+
+    // 호스트 변수 선언 (오라클과 값을 주고 받을 때)
+    EXEC SQL BEGIN DECLARE SECTION;
+    varchar v_userid[20];
+    varchar v_password[20];
+    varchar v_name[50];
+    varchar v_address[100];
+
+    char dynstmt[1000];
+    EXEC SQL END DECLARE SECTION;
+
+    char userid[20];
+    char password[20];
+    char name[50];
+    char address[100];
+
+    gotoxy(35, 14);
+    gets(userid);
+
+    gotoxy(35, 16);
+    gets(password);
+
+    gotoxy(35, 18);
+    gets(name);
+
+    gotoxy(35, 20);
+    gets(address);
+
+    sprintf(dynstmt,"INSERT INTO CUSTOMER VALUES ('%s', '%s', '%s', '%s', %d, sysdate)" , userid, password, name, address, /* 포인트 */0);
+    
+    /**
+     *  실행시킬 SQL 문장
+     *  결과 처리는 COMMIT WORK 이후에 해야 쿼리가 적용이 됨
+     * */
+    EXEC SQL EXECUTE IMMEDIATE : dynstmt;
+    EXEC SQL COMMIT WORK;
+
+    printf("## SignUp Success ##");
+    getch();
+
+    // 메인화면으로 돌아가기
+    startProcess();
+
+    return;
+}
+
+/**
+ * 회원가입 오류 처리 함수
+*/
+void signup_error(){
+    sql_error("\7ORACLE ERROR:\n");
+    getch();
+
+    signup();
+    return;
+}
+
+/**
+ * 로그인 함수
+ */
+void login()
+{
+    clrscr();
+    print_screen("login_screen.txt");
+
+    // 호스트 변수 선언 (오라클과 값을 주고 받을 때)
+    EXEC SQL BEGIN DECLARE SECTION;
+    varchar v_userid[100];
+    varchar v_password[100];
+
+    char dynstmt[1000];
+    EXEC SQL END DECLARE SECTION;
+
+    char userid[20];
+    char password[20];
+
+    /* Register sql_error() as the error handler. */
+    EXEC SQL WHENEVER SQLERROR DO sql_error("\7ORACLE ERROR:\n");
+
+    gotoxy(35, 12);
+    // printf("찾을 사람의 사원번호를 입력하세요:");
+    gets(userid);
+
+    gotoxy(35, 14);
+    // printf("찾을 사람의 이름을 입력하세요:");
+    gets(password);
+
+    /* 실행시킬 SQL 문장*/
+    sprintf(dynstmt, "SELECT userid, password FROM customer WHERE to_char(userid) = '%s' AND to_char(password) = '%s'",
+            userid, password);
+
+    /* select 문장이 제대로 구성되어 있는지 화면에 찍어봄 */
+    // printf("dynstmt:%s\n", dynstmt);
+
+    // 쿼리문 실행
+    EXEC SQL PREPARE S FROM : dynstmt;
+
+    /* cursor 선언 */
+    EXEC SQL DECLARE c_cursor CURSOR FOR S;
+
+    /* cursor open */
+    EXEC SQL OPEN c_cursor;
+    for (;;)
+    {
+        EXEC SQL WHENEVER NOT FOUND DO break;
+        EXEC SQL FETCH c_cursor INTO : v_userid, : v_password;
+
+        v_userid.arr[v_userid.len] = '\0';
+        v_password.arr[v_password.len] = '\0';
+    }
+
+    // 찾은 튜플의 수가 0인 경우 (로그인 실패)
+    gotoxy(24, 16);
+    if (sqlca.sqlerrd[2] == 0)
+    {
+        printf("## Not Found id or password ##");
+        getch();
+
+        login();
+        return;
+    } else {
+        printf("## Login Success ##");
+        clrscr();
+    }
+
+    /* Close the cursor. */
+    EXEC SQL CLOSE c_cursor;
+}
+
+
+/* --------------------------------------------------------------------------
+int sql_error()
+
+   errrpt prints the ORACLE error msg and number.
+-------------------------------------------------------------------------- */
+void sql_error(char *msg)
+{
+    char err_msg[128];
+    size_t buf_len, msg_len;
+
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+
+    printf("\n%s\n", msg);
+    buf_len = sizeof(err_msg);
+    sqlglm(err_msg, &buf_len, &msg_len);
+    printf("%.*s\n", msg_len, err_msg);
+
+    getch();
+    EXEC SQL ROLLBACK WORK;
+    // exit(EXIT_FAILURE);
+}
+/*---------------  화면 커서 제어 함수 --------------------*/
+#define STD_HANDLE GetStdHandle(STD_OUTPUT_HANDLE)
+
+/**
+ * 커서 이동 함수
+ * @param x int
+ * @param y int
+ */
+void gotoxy(int x, int y)
+{
+    COORD Cur = {(SHORT)x, (SHORT)y};
+
+    SetConsoleCursorPosition(STD_HANDLE, Cur);
+}
+
+void getxy(int *x, int *y)
+{
+    CONSOLE_SCREEN_BUFFER_INFO Buf;
+
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &Buf);
+    *x = (int)Buf.dwCursorPosition.X;
+    *y = (int)Buf.dwCursorPosition.Y;
+}
+
+/**
+ * 화면 클리어 함수
+ */
+void clrscr(void)
+{
+    COORD Cur = {0, 0};
+    unsigned long dwLen;
+
+    FillConsoleOutputCharacter(STD_HANDLE, ' ', 93 * 30, Cur, &dwLen);
+    gotoxy(1,1);
+}
+
+/*---------------------------------------------------------*/

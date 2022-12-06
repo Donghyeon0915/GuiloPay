@@ -1,0 +1,7 @@
+﻿  proctest.c
+C:\Users\Dong\Desktop\GuiloPay\proctest.c(348,12): warning C4477: 'printf' : 서식 문자열 '%.*s'에 'int' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'size_t'입니다.
+C:\Users\Dong\Desktop\GuiloPay\proctest.c(348,12): message : 이 인수는 전체 자릿수로 사용됩니다.
+proctest.obj : error LNK2019: sqlcxtDB_connect 함수에서 참조되는 확인할 수 없는 외부 기호
+proctest.obj : error LNK2019: sqlglmsql_error 함수에서 참조되는 확인할 수 없는 외부 기호
+C:\proc_sdk\lib\msvc\orasql12.lib : warning LNK4272: 'x86' 라이브러리 컴퓨터 종류가 'x64' 대상 컴퓨터 종류와 충돌합니다.
+C:\Users\Dong\Desktop\GuiloPay\x64\Debug\GuiloPay.exe : fatal error LNK1120: 2개의 확인할 수 없는 외부 참조입니다.

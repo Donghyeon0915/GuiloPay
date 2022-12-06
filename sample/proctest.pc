@@ -1,0 +1,105 @@
+// win32 Visual C 컴파일시 추가
+// 프로그램 가장 첫 줄에 추가할 것
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+#include <conio.h>
+
+/* for oracle */
+#include <sqlda.h>
+#include <sqlca.h>
+#include <sqlcpr.h>
+
+
+void DB_connect();
+void Get_tuple();
+void sql_error(char *msg) ;
+
+EXEC SQL BEGIN DECLARE SECTION;
+	VARCHAR uid[80];
+	VARCHAR pwd[20];
+EXEC SQL END DECLARE SECTION;
+
+// win32 Visual C 컴파일시 추가
+#define getch() _getch()
+
+void main()
+{
+	DB_connect();
+	Get_tuple();
+	getch();
+}
+void DB_connect()
+{
+   /* 본인 계정이름으로 바꾸어 쓸 것 */
+   strcpy((char *)uid.arr,"scott@//sedb.deu.ac.kr:1521/orcl");
+   uid.len = (short) strlen((char *)uid.arr);
+   /* 본인 계정 암호로 바꾸어 쓸 것 */
+   strcpy((char *)pwd.arr,"tiger");
+   pwd.len = (short) strlen((char *)pwd.arr);
+
+   EXEC SQL CONNECT :uid IDENTIFIED BY :pwd;
+
+	// connection이 실패했을경우의 처리부분
+
+	if (sqlca.sqlcode != 0 && sqlca.sqlcode != -1405){ 
+		printf("\7Connect error: %s", sqlca.sqlerrm.sqlerrmc);
+		getch();
+		exit(-1);
+	}
+
+    printf("Oracle Connect SUCCESS by %s\n", uid.arr);
+}
+
+void Get_tuple()
+{
+/* --------------------------------------------------------------------------
+   Retrieve the current maximum employee number
+-------------------------------------------------------------------------- */
+EXEC SQL BEGIN DECLARE SECTION;
+   int  no;
+   varchar name[12];
+EXEC SQL END DECLARE SECTION;
+
+
+   /* Register sql_error() as the error handler. */
+   EXEC SQL WHENEVER SQLERROR DO sql_error("\7ORACLE ERROR:\n");
+
+   /* 실행시킬 SQL 문장*/
+   EXEC SQL SELECT empno, ename 
+                   into :no, :name 
+            FROM   emp 
+            WHERE  empno = '7369' ; 
+
+   name.arr[name.len] = '\0';   
+   printf("name = %s, namelen=%d no = %d,\n", name.arr, name.len, no );
+
+}
+
+
+/* --------------------------------------------------------------------------
+void sql_error(msg)
+
+   errrpt prints the ORACLE error msg and number.
+-------------------------------------------------------------------------- */
+void sql_error(char *msg)
+
+{
+    char err_msg[128];
+    size_t buf_len, msg_len;
+
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+
+    printf("\n%s\n", msg);
+    buf_len = sizeof (err_msg);
+    sqlglm(err_msg, &buf_len, &msg_len);
+    printf("%.*s\n", msg_len, err_msg);
+    getch();
+    
+    EXEC SQL ROLLBACK WORK;
+
+}
+
