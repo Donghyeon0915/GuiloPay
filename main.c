@@ -60,16 +60,16 @@ static struct sqltdss sqltds =
 struct sqlcxp
 {
   unsigned short fillen;
-           char  filnam[8];
+           char  filnam[10];
 };
 static const struct sqlcxp sqlfpn =
 {
-    7,
-    "main.pc"
+    9,
+    ".\\main.pc"
 };
 
 
-static unsigned int sqlctx = 9211;
+static unsigned int sqlctx = 32763;
 
 
 static struct sqlexd {
@@ -135,15 +135,15 @@ typedef struct { unsigned short len; unsigned char arr[1]; } varchar;
 /* cud (compilation unit data) array */
 static const short sqlcud0[] =
 {13,4130,1,0,0,
-5,0,0,1,0,0,30,56,0,0,0,0,0,1,0,
-20,0,0,0,0,0,27,68,0,0,4,4,0,1,0,1,9,0,0,1,9,0,0,1,10,0,0,1,10,0,0,
-51,0,0,3,0,0,24,173,0,0,1,1,0,1,0,1,97,0,0,
-70,0,0,4,0,0,29,174,0,0,0,0,0,1,0,
-85,0,0,5,0,0,17,234,0,0,1,1,0,1,0,1,97,0,0,
-104,0,0,5,0,0,45,240,0,0,0,0,0,1,0,
-119,0,0,5,0,0,13,244,0,0,2,0,0,1,0,2,9,0,0,2,9,0,0,
-142,0,0,5,0,0,15,265,0,0,0,0,0,1,0,
-157,0,0,6,0,0,31,287,0,0,0,0,0,1,0,
+5,0,0,1,0,0,30,58,0,0,0,0,0,1,0,
+20,0,0,0,0,0,27,70,0,0,4,4,0,1,0,1,9,0,0,1,9,0,0,1,10,0,0,1,10,0,0,
+51,0,0,3,0,0,24,175,0,0,1,1,0,1,0,1,97,0,0,
+70,0,0,4,0,0,29,176,0,0,0,0,0,1,0,
+85,0,0,5,0,0,17,236,0,0,1,1,0,1,0,1,97,0,0,
+104,0,0,5,0,0,45,242,0,0,0,0,0,1,0,
+119,0,0,5,0,0,13,246,0,0,2,0,0,1,0,2,9,0,0,2,9,0,0,
+142,0,0,5,0,0,15,267,0,0,0,0,0,1,0,
+157,0,0,6,0,0,31,288,0,0,0,0,0,1,0,
 };
 
 
@@ -163,6 +163,8 @@ static const short sqlcud0[] =
 #include <sqlda.h>
 #include <sqlca.h>
 #include <sqlcpr.h>
+
+#include "screenHandler/screenHandler.h"
 
 // win32 Visual C 2010 이상컴파일시 추가
 #define getch() _getch()
@@ -682,13 +684,12 @@ struct { unsigned short len; unsigned char arr[100]; } v_password;
 
 }
 
-
 /* --------------------------------------------------------------------------
 int sql_error()
 
    errrpt prints the ORACLE error msg and number.
 -------------------------------------------------------------------------- */
-void sql_error(char *msg)
+void sql_error(char* msg)
 {
     char err_msg[128];
     size_t buf_len, msg_len;
@@ -722,40 +723,3 @@ void sql_error(char *msg)
 
     // exit(EXIT_FAILURE);
 }
-/*---------------  화면 커서 제어 함수 --------------------*/
-#define STD_HANDLE GetStdHandle(STD_OUTPUT_HANDLE)
-
-/**
- * 커서 이동 함수
- * @param x int
- * @param y int
- */
-void gotoxy(int x, int y)
-{
-    COORD Cur = {(SHORT)x, (SHORT)y};
-
-    SetConsoleCursorPosition(STD_HANDLE, Cur);
-}
-
-void getxy(int *x, int *y)
-{
-    CONSOLE_SCREEN_BUFFER_INFO Buf;
-
-    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &Buf);
-    *x = (int)Buf.dwCursorPosition.X;
-    *y = (int)Buf.dwCursorPosition.Y;
-}
-
-/**
- * 화면 클리어 함수
- */
-void clrscr(void)
-{
-    COORD Cur = {0, 0};
-    unsigned long dwLen;
-
-    FillConsoleOutputCharacter(STD_HANDLE, ' ', 93 * 30, Cur, &dwLen);
-    gotoxy(1,1);
-}
-
-/*---------------------------------------------------------*/

@@ -15,6 +15,8 @@
 #include <sqlca.h>
 #include <sqlcpr.h>
 
+#include "screenHandler/screenHandler.h"
+
 // win32 Visual C 2010 이상컴파일시 추가
 #define getch() _getch()
 //-----------------------------------------
@@ -265,13 +267,12 @@ void login()
     EXEC SQL CLOSE c_cursor;
 }
 
-
 /* --------------------------------------------------------------------------
 int sql_error()
 
    errrpt prints the ORACLE error msg and number.
 -------------------------------------------------------------------------- */
-void sql_error(char *msg)
+void sql_error(char* msg)
 {
     char err_msg[128];
     size_t buf_len, msg_len;
@@ -287,40 +288,3 @@ void sql_error(char *msg)
     EXEC SQL ROLLBACK WORK;
     // exit(EXIT_FAILURE);
 }
-/*---------------  화면 커서 제어 함수 --------------------*/
-#define STD_HANDLE GetStdHandle(STD_OUTPUT_HANDLE)
-
-/**
- * 커서 이동 함수
- * @param x int
- * @param y int
- */
-void gotoxy(int x, int y)
-{
-    COORD Cur = {(SHORT)x, (SHORT)y};
-
-    SetConsoleCursorPosition(STD_HANDLE, Cur);
-}
-
-void getxy(int *x, int *y)
-{
-    CONSOLE_SCREEN_BUFFER_INFO Buf;
-
-    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &Buf);
-    *x = (int)Buf.dwCursorPosition.X;
-    *y = (int)Buf.dwCursorPosition.Y;
-}
-
-/**
- * 화면 클리어 함수
- */
-void clrscr(void)
-{
-    COORD Cur = {0, 0};
-    unsigned long dwLen;
-
-    FillConsoleOutputCharacter(STD_HANDLE, ' ', 93 * 30, Cur, &dwLen);
-    gotoxy(1,1);
-}
-
-/*---------------------------------------------------------*/
