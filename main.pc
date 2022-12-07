@@ -21,13 +21,6 @@
 #define getch() _getch()
 //-----------------------------------------
 
-/*--------------- 화면 커서 위치 제어 ------------------------*/
-#include < windows.h >
-void gotoxy(int x, int y);
-void getxy(int *x, int *y);
-void clrscr(void);
-/*-----------------------------------------------------------*/
-void print_screen(char fname[]);
 void DB_connect();
 void Get_tuple();
 void startProcess();
@@ -176,6 +169,7 @@ void signup_error(){
 void login()
 {
     clrscr();
+    gotoxy(1,1);
     print_screen("login_screen.txt");
 
     // 호스트 변수 선언 (오라클과 값을 주고 받을 때)
