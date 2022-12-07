@@ -2,5 +2,5 @@
 
 void mainmenu_main(){
     clrscr();
-    print_screen();
+    print_screen("screen/mainmenu_screen.txt");
 }

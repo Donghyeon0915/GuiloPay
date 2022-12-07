@@ -4,6 +4,11 @@
 #include < windows.h >
 #include <stdio.h>
 
+void print_screen(char*);
+void gotoxy(int, int);
+void getxy(int*, int*);
+void clrscr(void);
+
 /**
  * 화면 출력 함수
  */

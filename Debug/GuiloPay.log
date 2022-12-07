@@ -5,4 +5,8 @@ C:\Users\Dong\Desktop\GuiloPay\main.c(343,56): warning C4101: 'v_address' :참�
 C:\Users\Dong\Desktop\GuiloPay\main.c(340,55): warning C4101: 'v_name' :참조되지 않은 지역 변수입니다.
 C:\Users\Dong\Desktop\GuiloPay\main.c(337,55): warning C4101: 'v_password' :참조되지 않은 지역 변수입니다.
 C:\Users\Dong\Desktop\GuiloPay\main.c(334,55): warning C4101: 'v_userid' :참조되지 않은 지역 변수입니다.
+  screenHandler.c
+C:\Users\Dong\Desktop\GuiloPay\screenHandler\screenHandler.c(24,14): warning C4013: 'getch'이(가) 정의되지 않았습니다. extern은 int형을 반환하는 것으로 간주합니다.
+  코드를 생성하고 있습니다...
+  LINK : C:\Users\Dong\Desktop\GuiloPay\Debug\GuiloPay.exe을(를) 찾을 수 없거나 마지막 증분 링크에 의해 빌드되지 않았습니다. 전체 링크를 수행하고 있습니다.
   GuiloPay.vcxproj -> C:\Users\Dong\Desktop\GuiloPay\Debug\GuiloPay.exe
