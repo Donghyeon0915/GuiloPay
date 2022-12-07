@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="main.c" />
     <ClCompile Include="mainmenu\mainmenu.c" />
+    <ClCompile Include="mainmenu\test.c" />
     <ClCompile Include="sample\select_xy.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

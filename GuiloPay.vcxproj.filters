@@ -27,6 +27,9 @@
     <ClCompile Include="mainmenu\mainmenu.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="mainmenu\test.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="screenHandler\screenHandler.h">
