@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 /* for oracle */
 #include <sqlda.h>
 #include <sqlca.h>
@@ -5,8 +7,57 @@
 
 #include "../../screenHandler/screenHandler.h"
 
-void getPoint(){
+void getUserPoint(char*);
 
+void pointmenu_main(char* userid){
+    clrscr();
+    print_screen("screen/point_screen.txt");
+
+    getUserPoint(userid);
+
+    gotoxy(44, 16);
+
+    char input = getch();
+
+    if(input == '1') {  // 포인트 충전
+
+    } else if(input == '2') { // 포인트 반환
+
+    }
+}
+
+/**
+ * 사용자의 포인트를 가져오는 함수
+*/
+void getUserPoint(char* userid){
+        // 호스트 변수 선언 (오라클과 값을 주고 받을 때)
+    EXEC SQL BEGIN DECLARE SECTION;
+    int n_point;
+
+    char dynstmt[1000];
+    EXEC SQL END DECLARE SECTION;
+
+    /* Register sql_error() as the error handler. */
+    EXEC SQL WHENEVER SQLERROR DO sql_error("\7ORACLE ERROR:\n");
+
+    /* 실행시킬 SQL 문장*/
+    sprintf(dynstmt, "SELECT point FROM customer WHERE to_char(userid) = '%s'", userid);
+
+    // 쿼리문 실행
+    EXEC SQL PREPARE S FROM : dynstmt;
+
+    /* cursor 선언 */
+    EXEC SQL DECLARE c_cursor CURSOR FOR S;
+
+    /* cursor open */
+    EXEC SQL OPEN c_cursor;
+    EXEC SQL FETCH c_cursor INTO :n_point;
+
+    gotoxy(44,12);
+    printf("%d", n_point);
+
+    /* Close the cursor. */
+    EXEC SQL CLOSE c_cursor;
 }
 
 void printPointScreen(){

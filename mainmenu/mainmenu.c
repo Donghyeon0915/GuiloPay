@@ -9,7 +9,7 @@ void mainmenu_main(char *userid){
     
     gotoxy(15,28);
     printf("%s", userid);
-    
+
     gotoxy(29, 13);
 
     char input = getch();
@@ -24,7 +24,7 @@ void mainmenu_main(char *userid){
     }
     else if(input == '3') // 포인트 조회 메뉴
     {
-        pointmenu_main();   
+        pointmenu_main(userid);   
     }
     else if(input == '4') // 로그아웃 메뉴
     {

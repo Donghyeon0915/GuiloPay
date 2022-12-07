@@ -1,2 +1,2 @@
 
-void pointmenu_main();
+void pointmenu_main(char* userid);
