@@ -16,6 +16,7 @@
 #include <sqlcpr.h>
 
 #include "screenHandler/screenHandler.h"
+#include "mainmenu/mainmenu.h"
 
 // win32 Visual C 2010 이상컴파일시 추가
 #define getch() _getch()
@@ -229,6 +230,7 @@ void login()
     } else {
         printf("## Login Success ##");
         clrscr();
+        mainmenu_main();
     }
 
     /* Close the cursor. */
