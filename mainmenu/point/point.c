@@ -135,14 +135,19 @@ typedef struct { unsigned short len; unsigned char arr[1]; } varchar;
 /* cud (compilation unit data) array */
 static const short sqlcud0[] =
 {13,4130,1,0,0,
-5,0,0,1,0,0,17,44,0,0,1,1,0,1,0,1,97,0,0,
-24,0,0,1,0,0,45,50,0,0,0,0,0,1,0,
-39,0,0,1,0,0,13,51,0,0,1,0,0,1,0,2,3,0,0,
-58,0,0,1,0,0,15,57,0,0,0,0,0,1,0,
+5,0,0,1,0,0,17,53,0,0,1,1,0,1,0,1,97,0,0,
+24,0,0,1,0,0,45,59,0,0,0,0,0,1,0,
+39,0,0,1,0,0,13,60,0,0,1,0,0,1,0,2,3,0,0,
+58,0,0,1,0,0,15,66,0,0,0,0,0,1,0,
+73,0,0,2,0,0,24,105,0,0,1,1,0,1,0,1,97,0,0,
+92,0,0,3,0,0,29,106,0,0,0,0,0,1,0,
 };
 
 
 #define _CRT_SECURE_NO_WARNINGS
+
+#include <stdio.h>
+#include <stdlib.h>
 
 /* for oracle */
 #include <sqlda.h>
@@ -151,26 +156,32 @@ static const short sqlcud0[] =
 
 #include "../../screenHandler/screenHandler.h"
 
-void getUserPoint(char*);
+int getUserPoint(char*);
+void addPoint(char*, int);
+void addPointError(char*);
 
 void pointmenu_main(char* userid){
     clrscr();
     print_screen("screen/point_screen.txt");
 
-    getUserPoint(userid);
+    // 사용자의 포인트 받아오기 + 출력
+    int point = getUserPoint(userid);
 
     gotoxy(44, 16);
 
     char input = getch();
 
     if(input == '1') {  // 포인트 충전
-
+        addPoint(userid, point);
     } else if(input == '2') { // 포인트 반환
 
     }
 }
 
-void getUserPoint(char* userid){
+/**
+ * 사용자의 포인트를 가져오는 함수
+*/
+int getUserPoint(char* userid){
         // 호스트 변수 선언 (오라클과 값을 주고 받을 때)
     /* EXEC SQL BEGIN DECLARE SECTION; */ 
 
@@ -187,7 +198,7 @@ void getUserPoint(char* userid){
     /* 실행시킬 SQL 문장*/
     sprintf(dynstmt, "SELECT point FROM customer WHERE to_char(userid) = '%s'", userid);
 
-        // 쿼리문 실행
+    // 쿼리문 실행
     /* EXEC SQL PREPARE S FROM : dynstmt; */ 
 
 {
@@ -318,10 +329,113 @@ void getUserPoint(char* userid){
 }
 
 
-    
-    
+
+    return n_point;
 }
 
-void printPointScreen(){
+/**
+ * 포인트 충전 함수
+ * @param u_point
+*/
+void addPoint(char* userid, int userPoint){
 
+    clrscr();
+    print_screen("screen/add_point_screen.txt");
+    
+    // 호스트 변수 선언 (오라클과 값을 주고 받을 때)
+    /* EXEC SQL BEGIN DECLARE SECTION; */ 
+
+    int n_point = userPoint; // 사용자의 포인트
+
+    char dynstmt[1000];
+    /* EXEC SQL END DECLARE SECTION; */ 
+
+    /* EXEC SQL WHENEVER SQLERROR DO addPointError(dynstmt); */ 
+
+
+    char inputPoint[100];
+
+    gotoxy(44,12);
+    printf("%d", n_point);
+
+    int point = 0;
+    gotoxy(44, 16);
+    gets(inputPoint);
+
+    n_point = n_point + atoi(inputPoint); // 기존 유저의 포인트에 추가
+
+    sprintf(dynstmt,"UPDATE customer SET point = %d WHERE to_char(userid) = '%s'", /* 포인트 */n_point, userid);
+    
+    /**
+     *  실행시킬 SQL 문장
+     *  결과 처리는 COMMIT WORK 이후에 해야 쿼리가 적용이 됨
+     * */
+    /* EXEC SQL EXECUTE IMMEDIATE : dynstmt; */ 
+
+{
+    struct sqlexd sqlstm;
+    sqlstm.sqlvsn = 13;
+    sqlstm.arrsiz = 1;
+    sqlstm.sqladtp = &sqladt;
+    sqlstm.sqltdsp = &sqltds;
+    sqlstm.stmt = "";
+    sqlstm.iters = (unsigned int  )1;
+    sqlstm.offset = (unsigned int  )73;
+    sqlstm.cud = sqlcud0;
+    sqlstm.sqlest = (unsigned char  *)&sqlca;
+    sqlstm.sqlety = (unsigned short)4352;
+    sqlstm.occurs = (unsigned int  )0;
+    sqlstm.sqhstv[0] = (         void  *)dynstmt;
+    sqlstm.sqhstl[0] = (unsigned int  )1000;
+    sqlstm.sqhsts[0] = (         int  )0;
+    sqlstm.sqindv[0] = (         void  *)0;
+    sqlstm.sqinds[0] = (         int  )0;
+    sqlstm.sqharm[0] = (unsigned int  )0;
+    sqlstm.sqadto[0] = (unsigned short )0;
+    sqlstm.sqtdso[0] = (unsigned short )0;
+    sqlstm.sqphsv = sqlstm.sqhstv;
+    sqlstm.sqphsl = sqlstm.sqhstl;
+    sqlstm.sqphss = sqlstm.sqhsts;
+    sqlstm.sqpind = sqlstm.sqindv;
+    sqlstm.sqpins = sqlstm.sqinds;
+    sqlstm.sqparm = sqlstm.sqharm;
+    sqlstm.sqparc = sqlstm.sqharc;
+    sqlstm.sqpadto = sqlstm.sqadto;
+    sqlstm.sqptdso = sqlstm.sqtdso;
+    sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
+    if (sqlca.sqlcode < 0) addPointError(dynstmt);
+}
+
+
+    /* EXEC SQL COMMIT WORK; */ 
+
+{
+    struct sqlexd sqlstm;
+    sqlstm.sqlvsn = 13;
+    sqlstm.arrsiz = 1;
+    sqlstm.sqladtp = &sqladt;
+    sqlstm.sqltdsp = &sqltds;
+    sqlstm.iters = (unsigned int  )1;
+    sqlstm.offset = (unsigned int  )92;
+    sqlstm.cud = sqlcud0;
+    sqlstm.sqlest = (unsigned char  *)&sqlca;
+    sqlstm.sqlety = (unsigned short)4352;
+    sqlstm.occurs = (unsigned int  )0;
+    sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
+    if (sqlca.sqlcode < 0) addPointError(dynstmt);
+}
+
+
+
+    gotoxy(32, 20);
+    printf("## Add Point Success ##");
+    
+    getch();
+    pointmenu_main(userid);
+}
+
+void addPointError(char* dynstmt){
+    gotoxy(90,1);
+    printf("[ Add Point Error ]\n");
+    printf("[ Query ] : %s", dynstmt);
 }
