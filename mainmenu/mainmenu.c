@@ -3,10 +3,13 @@
 #include "../screenHandler/screenHandler.h"
 #include "./point/point.h"
 
-void mainmenu_main(){
+void mainmenu_main(char *userid){
     clrscr();
     print_screen("screen/mainmenu_screen.txt");
-
+    
+    gotoxy(15,28);
+    printf("%s", userid);
+    
     gotoxy(29, 13);
 
     char input = getch();
