@@ -9,6 +9,7 @@
  */
 void print_screen(char fname[])
 {
+    gotoxy(1,1);
     FILE *fp;
     char line[100];
 

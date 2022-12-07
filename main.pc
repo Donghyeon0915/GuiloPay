@@ -169,7 +169,6 @@ void signup_error(){
 void login()
 {
     clrscr();
-    gotoxy(1,1);
     print_screen("screen/login_screen.txt");
 
     // 호스트 변수 선언 (오라클과 값을 주고 받을 때)
