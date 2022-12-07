@@ -81,31 +81,6 @@ void DB_connect()
     printf("Oracle Connect SUCCESS by %s\n", uid.arr);
 }
 
-/**
- * 화면 출력 함수
- */
-void print_screen(char fname[])
-{
-    FILE *fp;
-    char line[100];
-
-    if ((fp = fopen(fname, "r")) == NULL)
-    {
-        printf("file open error\n");
-        getch();
-        exit(-1);
-    }
-    while (1)
-    {
-        if (fgets(line, 99, fp) == NULL)
-        {
-            break;
-        }
-        printf("%s", line);
-    }
-
-    fclose(fp);
-}
 
 /**
  * 처음 시작되는 화면

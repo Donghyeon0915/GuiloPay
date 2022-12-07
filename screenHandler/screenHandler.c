@@ -1,5 +1,34 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 //#ifdef WIN32
 #include < windows.h >
+#include <stdio.h>
+
+/**
+ * 화면 출력 함수
+ */
+void print_screen(char fname[])
+{
+    FILE *fp;
+    char line[100];
+
+    if ((fp = fopen(fname, "r")) == NULL)
+    {
+        printf("file open error\n");
+        getch();
+        exit(-1);
+    }
+    while (1)
+    {
+        if (fgets(line, 99, fp) == NULL)
+        {
+            break;
+        }
+        printf("%s", line);
+    }
+
+    fclose(fp);
+}
 
 /*---------------  화면 커서 제어 함수 --------------------*/
 #define STD_HANDLE GetStdHandle(STD_OUTPUT_HANDLE)
@@ -28,5 +57,7 @@ void clrscr(void)
 
     FillConsoleOutputCharacter(STD_HANDLE, ' ', 80 * 25, Cur, &dwLen);
 }
+
+
 
 /*---------------------------------------------------------*/
