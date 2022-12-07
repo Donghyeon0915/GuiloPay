@@ -1,0 +1,14 @@
+/* for oracle */
+#include <sqlda.h>
+#include <sqlca.h>
+#include <sqlcpr.h>
+
+#include "../../screenHandler/screenHandler.h"
+
+void getPoint(){
+
+}
+
+void printPointScreen(){
+
+}

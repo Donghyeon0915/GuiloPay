@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "../screenHandler/screenHandler.h"
+#include "./point/point.h"
 
 void mainmenu_main(){
     clrscr();
@@ -20,7 +21,7 @@ void mainmenu_main(){
     }
     else if(input == '3') // 포인트 조회 메뉴
     {
-
+        pointmenu_main();   
     }
     else if(input == '4') // 로그아웃 메뉴
     {
