@@ -299,7 +299,7 @@ void DB_connect()
  */
 void startProcess(){
     clrscr();
-    print_screen("main_screen.txt");
+    print_screen("screen/main_screen.txt");
     gotoxy(33, 13);
 
     char input = getch();
@@ -316,7 +316,7 @@ void startProcess(){
  */
 void signup(){
     clrscr();
-    print_screen("signup_screen.txt");
+    print_screen("screen/signup_screen.txt");
 
     gotoxy(35, 14);
 
@@ -454,7 +454,7 @@ void login()
 {
     clrscr();
     gotoxy(1,1);
-    print_screen("login_screen.txt");
+    print_screen("screen/login_screen.txt");
 
     // 호스트 변수 선언 (오라클과 값을 주고 받을 때)
     /* EXEC SQL BEGIN DECLARE SECTION; */ 
