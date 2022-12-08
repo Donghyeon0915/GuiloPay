@@ -1,4 +1,7 @@
 /.vs
+/.vs
 /.vscode
 /Debug
 /x64
+*.vcxproj
+*.vcxproj.*
