@@ -139,8 +139,8 @@ static const short sqlcud0[] =
 24,0,0,1,0,0,45,62,0,0,0,0,0,1,0,
 39,0,0,1,0,0,13,63,0,0,1,0,0,1,0,2,3,0,0,
 58,0,0,1,0,0,15,69,0,0,0,0,0,1,0,
-73,0,0,2,0,0,24,110,0,0,1,1,0,1,0,1,97,0,0,
-92,0,0,3,0,0,29,111,0,0,0,0,0,1,0,
+73,0,0,2,0,0,24,114,0,0,1,1,0,1,0,1,97,0,0,
+92,0,0,3,0,0,29,115,0,0,0,0,0,1,0,
 };
 
 
@@ -345,7 +345,11 @@ int getUserPoint(char* userid){
 void managePoint(char* userid, int userPoint, int flag){
 
     clrscr();
-    print_screen("screen/add_point_screen.txt");
+    if(flag == ADD_POINT){
+        print_screen("screen/add_point_screen.txt");
+    } else if(flag == REFUND_POINT){
+        print_screen("screen/refund_point_screen.txt");
+    }
     
     // 호스트 변수 선언 (오라클과 값을 주고 받을 때)
     /* EXEC SQL BEGIN DECLARE SECTION; */ 
@@ -432,7 +436,7 @@ void managePoint(char* userid, int userPoint, int flag){
 
 
 
-    gotoxy(40, 20);
+    gotoxy(41, 27);
     printf("## Success ##");
 
     getch();
@@ -440,7 +444,8 @@ void managePoint(char* userid, int userPoint, int flag){
 }
 
 void pointError(char* dynstmt){
-    gotoxy(90,1);
+    gotoxy(42,27);
     printf("[ Point Error ]\n");
+    gotoxy(2,28);
     printf("[ Query ] : %s", dynstmt);
 }
