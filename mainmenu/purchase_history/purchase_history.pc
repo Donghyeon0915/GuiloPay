@@ -21,16 +21,19 @@
 
 /*---------------  화면 커서 위치 제어 ----------------------*/
 #include < windows.h >
-void gotoxy(int x, int y);
-void getxy(int *x, int *y);
-void clrscr(void);
+// void gotoxy(int x, int y);
+// void getxy(int *x, int *y);
+// void clrscr(void);
 /*-----------------------------------------------------------*/
-void print_screen(char fname[]);
-void DB_connect();
-void Get_tuple();
-int menu_input(char input,int flag);
+//void print_screen(char fname[]);
+//void DB_connect();
+
+extern void mainmenu_main(char *userid);
+
+void purchase_history(char *userid);
+int menu_input(char input,int flag, char *userid);
 void Delete_tuple(int num);
-void sql_error();
+void sql_error(char *);
 
 EXEC SQL BEGIN DECLARE SECTION;
 VARCHAR uid[80];
@@ -39,40 +42,10 @@ EXEC SQL END DECLARE SECTION;
 
 #define getch() _getch()
 
-void main()
-{
-   _putenv("NLS_LANG=American_America.KO16KSC5601"); // 한글사용
-
-   DB_connect();
-   Get_tuple();
-   EXEC SQL COMMIT WORK RELEASE;
-   getch();
-}
-void DB_connect()
-{
-   strcpy((char *)uid.arr, "a20183188@//sedb.deu.ac.kr:1521/orcl");
-   uid.len = (short)strlen((char *)uid.arr);
-   strcpy((char *)pwd.arr, "20183188");
-   pwd.len = (short)strlen((char *)pwd.arr);
-
-   EXEC SQL CONNECT : uid IDENTIFIED BY : pwd;
-
-   // connection이 실패했을경우의 처리부분
-
-   if (sqlca.sqlcode != 0 && sqlca.sqlcode != -1405)
-   {
-      printf("Connect error: %s", sqlca.sqlerrm.sqlerrmc);
-      getch();
-      exit(-1);
-   }
-
-   printf("Oracle Connect SUCCESS by %s\n", uid.arr);
-}
-
- int no[100]={0,};
+int no[100]={0,};
 
 #define PAGE_NUM 10
-void Get_tuple()
+void purchase_history(char *userid)
 {
    /* --------------------------------------------------------------------------
       Retrieve the current maximum employee number
@@ -102,7 +75,7 @@ void Get_tuple()
    print_screen("screen/product_purchase_history_screen.txt");
 
    /* 실행시킬 SQL 문장*/
-   sprintf(dynstmt, "SELECT id, product_name, cnt, totalprice, orderdate from V_ORDERS");
+   sprintf(dynstmt, "SELECT id, product_name, cnt, totalprice, orderdate from V_ORDERS where userid='%s'",userid);
 
    /* select 문장이 제대로 구성되어 있는지 화면에 찍어봄 */
    // printf("dynstmt:%s\n", dynstmt);
@@ -126,14 +99,17 @@ void Get_tuple()
       //EXEC SQL WHENEVER NOT FOUND DO break;
       EXEC SQL FETCH c_cursor INTO : id, : p_name, : cnt, : price, : o_date;
 
+
+      if(sqlca.sqlcode == 1403) {
+         break;
+      }
+
       p_name.arr[p_name.len] = '\0';
       o_date.arr[o_date.len] = '\0';
 
       no[j]=id;
 
-      if(sqlca.sqlcode == 1403) {
-         break;
-      }
+
 
 
       gotoxy(x, y);
@@ -156,30 +132,33 @@ void Get_tuple()
          while ((input = getch()) != 'n' && input != 'x' && input != 'm'); 
          
          int ret;
-         ret =menu_input(input,0);
+         ret =menu_input(input,0,userid);
          if(ret == 16){
             y=ret;
-            for(i = count ; i < PAGE_NUM-1; i++)
+            for(i = 0 ; i < PAGE_NUM-1; i++)
                printf("                                                                                                                        \n");
 
          } 
          else if(ret==17){
             gotoxy(0, 1);
             clrscr();
-            Get_tuple();
+            purchase_history(userid);
          }
          
          else
             break;
       }
+       for(i = count ; i < PAGE_NUM-1; i++)
+               printf("                                                                                                                        \n");
+
    }
  
    while ((input = getch()) != 'n' && input != 'x' && input != 'm');
-   if(menu_input(input,1)==17)
+   if(menu_input(input,1,userid)==17)
    {  
       gotoxy(0, 1);
       clrscr();
-      Get_tuple();
+      purchase_history(userid);
    }
    
    
@@ -190,7 +169,7 @@ void Get_tuple()
 
    EXEC SQL COMMIT;
 }
-int menu_input(char input,int flag)
+int menu_input(char input,int flag, char *userid)
 {
          if(input == 'n')
          { 
@@ -201,13 +180,12 @@ int menu_input(char input,int flag)
                   return 16+flag;
                }
 
-               
          }
 
          else if(input == 'x')
          {  
             gotoxy(0,28);
-            printf("          삭제할 주문 번호 입력 :                ( [0] 입력 시, 취소 )");
+            printf("          환불할 주문 번호 입력 :                ( [0] 입력 시, 취소 )");
             gotoxy(34,28);
             int input_num;
             scanf("%d",&input_num);
@@ -236,7 +214,7 @@ int menu_input(char input,int flag)
          }
          else if(input == 'm')
          {
-            exit(1);
+            mainmenu_main(userid);
          }
 
    return 0;
@@ -265,75 +243,75 @@ void Delete_tuple(int num)
 }
 
 
-void print_screen(char fname[])
-{
-   FILE *fp;
-   char line[100];
+// void print_screen(char fname[])
+// {
+//    FILE *fp;
+//    char line[100];
 
-   if ((fp = fopen(fname, "r")) == NULL)
-   {
-      printf("file open error\n");
-      getch();
-      exit(-1);
-   }
-   while (1)
-   {
-      if (fgets(line, 99, fp) == NULL)
-      {
-         break;
-      }
-      printf("%s", line);
-   }
+//    if ((fp = fopen(fname, "r")) == NULL)
+//    {
+//       printf("file open error\n");
+//       getch();
+//       exit(-1);
+//    }
+//    while (1)
+//    {
+//       if (fgets(line, 99, fp) == NULL)
+//       {
+//          break;
+//       }
+//       printf("%s", line);
+//    }
 
-   fclose(fp);
-}
+//    fclose(fp);
+// }
 
 /* --------------------------------------------------------------------------
 int sql_error()
 
    errrpt prints the ORACLE error msg and number.
 -------------------------------------------------------------------------- */
-void sql_error(char *msg)
-{
-   char err_msg[128];
-   size_t buf_len, msg_len;
+// void sql_error(char *msg)
+// {
+//    char err_msg[128];
+//    size_t buf_len, msg_len;
 
-   EXEC SQL WHENEVER SQLERROR CONTINUE;
+//    EXEC SQL WHENEVER SQLERROR CONTINUE;
 
-   printf("\n%s\n", msg);
-   buf_len = sizeof(err_msg);
-   sqlglm(err_msg, &buf_len, &msg_len);
-   printf("%.*s\n", msg_len, err_msg);
+//    printf("\n%s\n", msg);
+//    buf_len = sizeof(err_msg);
+//    sqlglm(err_msg, &buf_len, &msg_len);
+//    printf("%.*s\n", msg_len, err_msg);
 
-   getch();
-   EXEC SQL ROLLBACK WORK;
-   // exit(EXIT_FAILURE);
-}
-/*---------------  화면 커서 제어 함수 --------------------*/
-#define STD_HANDLE GetStdHandle(STD_OUTPUT_HANDLE)
+//    getch();
+//    EXEC SQL ROLLBACK WORK;
+//    // exit(EXIT_FAILURE);
+// }
+// /*---------------  화면 커서 제어 함수 --------------------*/
+// #define STD_HANDLE GetStdHandle(STD_OUTPUT_HANDLE)
 
-void gotoxy(int x, int y)
-{
-   COORD Cur = {(SHORT)x, (SHORT)y};
+// void gotoxy(int x, int y)
+// {
+//    COORD Cur = {(SHORT)x, (SHORT)y};
 
-   SetConsoleCursorPosition(STD_HANDLE, Cur);
-}
+//    SetConsoleCursorPosition(STD_HANDLE, Cur);
+// }
 
-void getxy(int *x, int *y)
-{
-   CONSOLE_SCREEN_BUFFER_INFO Buf;
+// void getxy(int *x, int *y)
+// {
+//    CONSOLE_SCREEN_BUFFER_INFO Buf;
 
-   GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &Buf);
-   *x = (int)Buf.dwCursorPosition.X;
-   *y = (int)Buf.dwCursorPosition.Y;
-}
+//    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &Buf);
+//    *x = (int)Buf.dwCursorPosition.X;
+//    *y = (int)Buf.dwCursorPosition.Y;
+// }
 
-void clrscr(void)
-{
-   COORD Cur = {0, 0};
-   unsigned long dwLen;
+// void clrscr(void)
+// {
+//    COORD Cur = {0, 0};
+//    unsigned long dwLen;
 
-   FillConsoleOutputCharacter(STD_HANDLE, ' ', 80 * 25, Cur, &dwLen);
-}
+//    FillConsoleOutputCharacter(STD_HANDLE, ' ', 80 * 25, Cur, &dwLen);
+// }
 
-/*---------------------------------------------------------*/
+// /*---------------------------------------------------------*/

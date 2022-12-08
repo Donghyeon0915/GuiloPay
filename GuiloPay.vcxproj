@@ -23,6 +23,9 @@
     <ClCompile Include="mainmenu\mainmenu.c" />
     <ClCompile Include="mainmenu\point\point.c" />
     <ClCompile Include="mainmenu\productmenu\productmenu.c" />
+    <ClCompile Include="mainmenu\purchase_history\purchase_history.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="sample\select_xy.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -30,7 +33,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="screenHandler\screenHandler.c" />
-    <ClCompile Include="mainmenu\purchase_history\purchase_history.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainmenu\mainmenu.h" />

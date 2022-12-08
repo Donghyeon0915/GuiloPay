@@ -4,8 +4,9 @@
 #include "./point/point.h"
 #include "./productmenu/productmenu.h"
 
-extern void startProcess();
 
+extern void startProcess();
+extern void purchase_history(char *userid);
 void mainmenu_main(char *userid){
     clrscr();
     print_screen("screen/mainmenu_screen.txt");
@@ -23,6 +24,7 @@ void mainmenu_main(char *userid){
             break;
         }
         else if (input == '2') { // 상품 구매 내역 조회 메뉴
+            purchase_history(userid);
         }
         else if (input == '3')  { // 포인트 조회 메뉴
             pointmenu_main(userid);
