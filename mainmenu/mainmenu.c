@@ -4,6 +4,8 @@
 #include "./point/point.h"
 #include "./productmenu/productmenu.h"
 
+extern void startProcess();
+
 void mainmenu_main(char *userid){
     clrscr();
     print_screen("screen/mainmenu_screen.txt");
@@ -29,6 +31,6 @@ void mainmenu_main(char *userid){
     }
     else if(input == '4') // 로그아웃 메뉴
     {
-
+        startProcess();
     }
 }
