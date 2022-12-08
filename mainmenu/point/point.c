@@ -60,16 +60,16 @@ static struct sqltdss sqltds =
 struct sqlcxp
 {
   unsigned short fillen;
-           char  filnam[11];
+           char  filnam[9];
 };
 static const struct sqlcxp sqlfpn =
 {
-    10,
-    ".\\point.pc"
+    8,
+    "point.pc"
 };
 
 
-static unsigned int sqlctx = 67067;
+static unsigned int sqlctx = 19963;
 
 
 static struct sqlexd {
