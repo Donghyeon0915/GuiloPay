@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "../screenHandler/screenHandler.h"
+#include "./productmenu/productmenu.h"
 
 void mainmenu_main(){
     clrscr();
@@ -12,7 +13,7 @@ void mainmenu_main(){
 
     if (input == '1') // 상품 조회 메뉴
     { 
-        
+        productmenu_main();
     }
     else if (input == '2') // 상품 구매 내역 조회 메뉴
     { 
