@@ -301,7 +301,7 @@ void DB_connect()
 void startProcess(){
     clrscr();
     print_screen("screen/main_screen.txt");
-    gotoxy(33, 13);
+    gotoxy(40, 13);
 
     char input;
     while ((input = getch())){
