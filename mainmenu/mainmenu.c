@@ -2,6 +2,7 @@
 
 #include "../screenHandler/screenHandler.h"
 #include "./point/point.h"
+#include "./productmenu/productmenu.h"
 
 void mainmenu_main(char *userid){
     clrscr();
@@ -16,7 +17,7 @@ void mainmenu_main(char *userid){
 
     if (input == '1') // 상품 조회 메뉴
     { 
-        
+        productmenu_main();
     }
     else if (input == '2') // 상품 구매 내역 조회 메뉴
     { 
