@@ -1,4 +1,6 @@
-.vs
-.vscode
-Debug
-x64
+/.vs
+/.vs
+/.vscode
+/Debug
+/x64
+

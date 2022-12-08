@@ -20,6 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
+    <ClCompile Include="mainmenu\mainmenu.c" />
+    <ClCompile Include="mainmenu\point\point.c" />
+    <ClCompile Include="mainmenu\productmenu\productmenu.c" />
+    <ClCompile Include="mainmenu\purchase_history\purchase_history.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="sample\select_xy.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -29,6 +35,9 @@
     <ClCompile Include="screenHandler\screenHandler.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="mainmenu\mainmenu.h" />
+    <ClInclude Include="mainmenu\point\point.h" />
+    <ClInclude Include="mainmenu\productmenu\productmenu.h" />
     <ClInclude Include="screenHandler\screenHandler.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

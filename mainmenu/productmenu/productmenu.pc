@@ -1,0 +1,210 @@
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+#include <conio.h>
+
+/* for oracle */
+#include <sqlda.h>
+#include <sqlca.h>
+#include <sqlcpr.h>
+
+#include "../mainmenu.h"
+#include "../../screenHandler/screenHandler.h"
+
+// win32 Visual C 2010 이상컴파일시 추가
+#define getch() _getch()
+//-----------------------------------------
+
+/*---------------  화면 커서 위치 제어 ----------------------*/
+#include < windows.h >
+void gotoxy(int x, int y);
+void getxy(int *x, int *y);
+void clrscr(void);
+/*-----------------------------------------------------------*/
+void print_screen(char fname[]);
+void DB_connect();
+void productSelect(char *);
+void getUserInfo(char *, int);
+int getPoint(char *);
+void run(char*);
+
+void sql_error();
+
+void productmenu_main(char *userid)
+{
+    _putenv("NLS_LANG=American_America.KO16KSC5601"); // 한글사용
+
+    run(userid);
+
+    EXEC SQL COMMIT WORK RELEASE;
+    getch();
+}
+
+void run(char *userid) {
+    int point = getPoint(userid);
+    getUserInfo(userid, point);
+    productSelect(userid);
+}
+
+
+/**
+ * 사용자의 포인트를 가져오는 함수
+ */
+int getPoint(char *userid)
+{
+    // 호스트 변수 선언 (오라클과 값을 주고 받을 때)
+    EXEC SQL BEGIN DECLARE SECTION;
+    int n_point;
+
+    char dynstmt[1000];
+    EXEC SQL END DECLARE SECTION;
+
+    /* Register sql_error() as the error handler. */
+    EXEC SQL WHENEVER SQLERROR DO sql_error("\7ORACLE ERROR:\n");
+
+    /* 실행시킬 SQL 문장*/
+    sprintf(dynstmt, "SELECT point FROM customer WHERE to_char(userid) = '%s'", userid);
+
+    // 쿼리문 실행
+    EXEC SQL PREPARE S FROM : dynstmt;
+
+    /* cursor 선언 */
+    EXEC SQL DECLARE c_cursor1 CURSOR FOR S;
+
+    /* cursor open */
+    EXEC SQL OPEN c_cursor1;
+    EXEC SQL FETCH c_cursor1 INTO : n_point;
+
+    /* Close the cursor. */
+    EXEC SQL CLOSE c_cursor1;
+
+    return n_point;
+}
+
+void getUserInfo(char *userid, int point)
+{
+    int x, y = 0;
+    clrscr();
+    print_screen("screen/product_menu_screen.txt");
+
+    // 사용자 부분에 커서 이동
+    x = 40;
+    y = 29;
+    gotoxy(x, y);
+    printf(" %10s", userid);
+
+    x = 71;
+    y = 29;
+    gotoxy(x, y);
+    printf("%d", point);
+}
+
+#define PAGE_NUM 5
+void productSelect(char *userid)
+{
+    // 호스트 변수 선언 (오라클과 값을 주고 받을 때)
+    EXEC SQL BEGIN DECLARE SECTION;
+    varchar v_name[50];
+    int v_price;
+    int v_id; // product id
+
+    char dynstmt[1000];
+    EXEC SQL END DECLARE SECTION;
+
+    char name[20];
+    int price;
+    int id;
+
+    int x, y, count = 0, i;
+
+    /* Register sql_error() as the error handler. */
+    EXEC SQL WHENEVER SQLERROR DO sql_error("\7ORACLE ERROR:\n");
+
+    /* 실행시킬 SQL 문장*/
+    sprintf(dynstmt, "SELECT id, name, price FROM products ORDER BY id");
+
+    // 쿼리문 실행
+    EXEC SQL PREPARE S FROM : dynstmt;
+
+    /* cursor 선언 */
+    EXEC SQL DECLARE c_cursor CURSOR FOR S;
+
+    /* cursor open */
+    EXEC SQL OPEN c_cursor;
+
+    x = 16;
+    y = 14;
+
+    // 전부 조회해서 출력
+    for (;;)
+    {
+        EXEC SQL FETCH c_cursor INTO : v_id, : v_name, : v_price;
+        if (sqlca.sqlcode == 1403)     break;
+
+        v_name.arr[v_name.len] = '\0';
+
+        gotoxy(x, y);
+
+        printf(" [ %4d  ]        | %20s   |     |   $%8d   |", v_id, v_name.arr, v_price);
+        y = y + 2;
+        count++;
+
+        // 하나씩 출력하다가 페이지 수랑 같아지면 멈춤 (입력 기다림)
+        if (count == PAGE_NUM)
+        {
+
+            count = 0;
+            char input;
+            /**
+             * n 또는 x가 가능한 입력 (가능한 입력이 아니면 아무 동작 하지 않음)
+             * 이렇게하면 한 화면에서 여러 입력을 처리할 수 있음
+             */
+            while ((input = getch()) != 'n' && input != 'x')
+                ;
+
+            // 입력으로 n가 들어온 경우
+            if (input == 'n')
+            {
+                gotoxy(16, 14); // 이전 화면 부분 클리어
+                for (i = 0; i < PAGE_NUM * 2; i++)
+                {
+                    printf("                                                                                    \n");
+                }
+
+                y = 14;
+            }
+            // 입력으로 x가 들어온 경우
+            else if (input == 'x')
+            {
+                mainmenu_main(userid);
+                return;
+            }
+        }
+    }
+    gotoxy(x, 22);
+    printf("                              (END)\n");
+
+    int productCode = 0;
+    gotoxy(45, 25);
+    scanf("%d", &productCode);
+
+    int num;
+    gotoxy(71, 25);
+    scanf("%d", &num);
+
+    sprintf(dynstmt, "INSERT INTO orders VALUES (orders_seq.NEXTVAL, %d, %d, '%s', sysdate)", num, productCode, userid);
+
+    EXEC SQL EXECUTE IMMEDIATE : dynstmt;
+    EXEC SQL COMMIT WORK;
+
+    /* Close the cursor. */
+    EXEC SQL CLOSE c_cursor;
+
+    printf("## order Success ##");
+    getch();
+
+    run(userid);
+}

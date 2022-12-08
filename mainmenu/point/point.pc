@@ -1,0 +1,133 @@
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+
+/* for oracle */
+#include <sqlda.h>
+#include <sqlca.h>
+#include <sqlcpr.h>
+
+#include "../../screenHandler/screenHandler.h"
+#include "../../mainmenu/mainmenu.h"
+
+#define ADD_POINT 1
+#define REFUND_POINT -1
+
+int getUserPoint(char*);
+void managePoint(char*, int, int);
+void pointError(char*);
+
+void pointmenu_main(char* userid){
+    clrscr();
+    print_screen("screen/point_screen.txt");
+
+    // 사용자의 포인트 받아오기 + 출력
+    int point = getUserPoint(userid);
+
+    gotoxy(44, 16);
+
+    char input = getch();
+
+    if(input == '1') {  // 포인트 충전
+        managePoint(userid, point, ADD_POINT);
+    } else if(input == '2') { // 포인트 반환
+        managePoint(userid, point, REFUND_POINT);
+    } else if(input == 'x'){
+        mainmenu_main(userid);
+    }
+}
+
+/**
+ * 사용자의 포인트를 가져오는 함수
+*/
+int getUserPoint(char* userid){
+        // 호스트 변수 선언 (오라클과 값을 주고 받을 때)
+    EXEC SQL BEGIN DECLARE SECTION;
+    int n_point;
+
+    char dynstmt[1000];
+    EXEC SQL END DECLARE SECTION;
+
+    /* Register sql_error() as the error handler. */
+    EXEC SQL WHENEVER SQLERROR DO sql_error("\7ORACLE ERROR:\n");
+
+    /* 실행시킬 SQL 문장*/
+    sprintf(dynstmt, "SELECT point FROM customer WHERE to_char(userid) = '%s'", userid);
+
+    // 쿼리문 실행
+    EXEC SQL PREPARE S FROM : dynstmt;
+
+    /* cursor 선언 */
+    EXEC SQL DECLARE c_cursor CURSOR FOR S;
+
+    /* cursor open */
+    EXEC SQL OPEN c_cursor;
+    EXEC SQL FETCH c_cursor INTO :n_point;
+
+    gotoxy(44,12);
+    printf("%d", n_point);
+
+    /* Close the cursor. */
+    EXEC SQL CLOSE c_cursor;
+
+    return n_point;
+}
+
+/**
+ * 포인트 관리 함수
+ * @param userid
+ * @param userPoint
+ * @param flag
+*/
+void managePoint(char* userid, int userPoint, int flag){
+
+    clrscr();
+    if(flag == ADD_POINT){
+        print_screen("screen/add_point_screen.txt");
+    } else if(flag == REFUND_POINT){
+        print_screen("screen/refund_point_screen.txt");
+    }
+    
+    // 호스트 변수 선언 (오라클과 값을 주고 받을 때)
+    EXEC SQL BEGIN DECLARE SECTION;
+    int n_point = userPoint; // 사용자의 포인트
+
+    char dynstmt[1000];
+    EXEC SQL END DECLARE SECTION;
+    EXEC SQL WHENEVER SQLERROR DO pointError(dynstmt);
+
+    char inputPoint[100];
+
+    gotoxy(44,12);
+    printf("%d", n_point);
+
+    int point = 0;
+    gotoxy(44, 16);
+    gets(inputPoint);
+
+    if(flag == ADD_POINT){
+        n_point = n_point + atoi(inputPoint); // 기존 유저의 포인트에 추가
+    } else if(flag == REFUND_POINT){
+        n_point = n_point - atoi(inputPoint); // 기존 유저의 포인트에 차감
+    }
+
+    sprintf(dynstmt,"UPDATE customer SET point = %d WHERE to_char(userid) = '%s'", /* 포인트 */n_point, userid);
+    
+    EXEC SQL EXECUTE IMMEDIATE : dynstmt;
+    EXEC SQL COMMIT WORK;
+
+    gotoxy(41, 27);
+    printf("## Success ##");
+
+    getch();
+    pointmenu_main(userid);
+}
+
+void pointError(char* dynstmt){
+    gotoxy(42,27);
+    printf("[ Point Error ]\n");
+    gotoxy(2,28);
+    printf("[ Query ] : %s", dynstmt);
+}

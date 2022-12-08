@@ -60,16 +60,16 @@ static struct sqltdss sqltds =
 struct sqlcxp
 {
   unsigned short fillen;
-           char  filnam[10];
+           char  filnam[17];
 };
 static const struct sqlcxp sqlfpn =
 {
-    9,
-    ".\\main.pc"
+    16,
+    ".\\productmenu.pc"
 };
 
 
-static unsigned int sqlctx = 32763;
+static unsigned int sqlctx = 4318211;
 
 
 static struct sqlexd {
@@ -103,16 +103,16 @@ static struct sqlexd {
    unsigned int   sqcmod;
    unsigned int   sqfmod;
    unsigned int   sqlpfmem;
-            void  *sqhstv[4];
-   unsigned int   sqhstl[4];
-            int   sqhsts[4];
-            void  *sqindv[4];
-            int   sqinds[4];
-   unsigned int   sqharm[4];
-   unsigned int   *sqharc[4];
-   unsigned short  sqadto[4];
-   unsigned short  sqtdso[4];
-} sqlstm = {13,4};
+            void  *sqhstv[3];
+   unsigned int   sqhstl[3];
+            int   sqhsts[3];
+            void  *sqindv[3];
+            int   sqinds[3];
+   unsigned int   sqharm[3];
+   unsigned int   *sqharc[3];
+   unsigned short  sqadto[3];
+   unsigned short  sqtdso[3];
+} sqlstm = {13,3};
 
 /* SQLLIB Prototypes */
 extern void sqlcxt (void **, unsigned int *,
@@ -135,23 +135,21 @@ typedef struct { unsigned short len; unsigned char arr[1]; } varchar;
 /* cud (compilation unit data) array */
 static const short sqlcud0[] =
 {13,4130,1,0,0,
-5,0,0,1,0,0,30,52,0,0,0,0,0,1,0,
-20,0,0,0,0,0,27,64,0,0,4,4,0,1,0,1,9,0,0,1,9,0,0,1,10,0,0,1,10,0,0,
-51,0,0,3,0,0,24,153,0,0,1,1,0,1,0,1,97,0,0,
-70,0,0,4,0,0,29,154,0,0,0,0,0,1,0,
-85,0,0,5,0,0,17,213,0,0,1,1,0,1,0,1,97,0,0,
-104,0,0,5,0,0,45,219,0,0,0,0,0,1,0,
-119,0,0,5,0,0,13,223,0,0,2,0,0,1,0,2,9,0,0,2,9,0,0,
-142,0,0,5,0,0,15,247,0,0,0,0,0,1,0,
-157,0,0,6,0,0,31,268,0,0,0,0,0,1,0,
+5,0,0,1,0,0,30,42,0,0,0,0,0,1,0,
+20,0,0,2,0,0,17,72,0,0,1,1,0,1,0,1,97,0,0,
+39,0,0,2,0,0,45,78,0,0,0,0,0,1,0,
+54,0,0,2,0,0,13,79,0,0,1,0,0,1,0,2,3,0,0,
+73,0,0,2,0,0,15,82,0,0,0,0,0,1,0,
+88,0,0,2,0,0,17,130,0,0,1,1,0,1,0,1,97,0,0,
+107,0,0,2,0,0,45,136,0,0,0,0,0,1,0,
+122,0,0,2,0,0,13,144,0,0,3,0,0,1,0,2,3,0,0,2,9,0,0,2,3,0,0,
+149,0,0,3,0,0,24,200,0,0,1,1,0,1,0,1,97,0,0,
+168,0,0,4,0,0,29,201,0,0,0,0,0,1,0,
+183,0,0,2,0,0,15,204,0,0,0,0,0,1,0,
 };
 
 
-// 마지막고침 : 2020.11.17
-// win32 Visual C 2010 이상컴파일시 추가
-// 프로그램 가장 첫 줄에 추가할 것
 #define _CRT_SECURE_NO_WARNINGS
-//-----------------------------------------
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -164,45 +162,33 @@ static const short sqlcud0[] =
 #include <sqlca.h>
 #include <sqlcpr.h>
 
-#include "screenHandler/screenHandler.h"
-#include "mainmenu/mainmenu.h"
+#include "../mainmenu.h"
+#include "../../screenHandler/screenHandler.h"
 
 // win32 Visual C 2010 이상컴파일시 추가
 #define getch() _getch()
 //-----------------------------------------
 
+/*---------------  화면 커서 위치 제어 ----------------------*/
+#include < windows.h >
+void gotoxy(int x, int y);
+void getxy(int *x, int *y);
+void clrscr(void);
+/*-----------------------------------------------------------*/
+void print_screen(char fname[]);
 void DB_connect();
-void Get_tuple();
-void startProcess();
-void login();
-void signup();
+void productSelect(char *);
+void getUserInfo(char *, int);
+int getPoint(char *);
+void run(char*);
 
 void sql_error();
-void signup_error();
 
-#define getch() _getch()
-
-#define SUCCESS 0 // 정상적으로 처리된 경우
-#define NOTFOUND 1403 // 조회된 데이터가 없다는 의미
-#define NOINSERT 100 // INSERT된 데이터가 없다는 의미.(단 컴파일 옵션이 MODE=ANSI 일때)
-
-/* EXEC SQL BEGIN DECLARE SECTION; */ 
-
-/* VARCHAR uid[80]; */ 
-struct { unsigned short len; unsigned char arr[80]; } uid;
-
-/* VARCHAR pwd[20]; */ 
-struct { unsigned short len; unsigned char arr[20]; } pwd;
-
-/* EXEC SQL END DECLARE SECTION; */ 
-
-
-void main()
+void productmenu_main(char *userid)
 {
-    _putenv("NLS_LANG=American_America.KO16KSC5601"); //한글사용
+    _putenv("NLS_LANG=American_America.KO16KSC5601"); // 한글사용
 
-    DB_connect();
-    startProcess();
+    run(userid);
 
     /* EXEC SQL COMMIT WORK RELEASE; */ 
 
@@ -222,175 +208,49 @@ void main()
 }
 
 
-
     getch();
 }
 
-void DB_connect()
-{
-    strcpy((char *)uid.arr, "a20183188@//sedb.deu.ac.kr:1521/orcl");
-    uid.len = (short)strlen((char *)uid.arr);
-    strcpy((char *)pwd.arr, "20183188");
-    pwd.len = (short)strlen((char *)pwd.arr);
-
-    /* EXEC SQL CONNECT : uid IDENTIFIED BY : pwd; */ 
-
-{
-    struct sqlexd sqlstm;
-    sqlstm.sqlvsn = 13;
-    sqlstm.arrsiz = 4;
-    sqlstm.sqladtp = &sqladt;
-    sqlstm.sqltdsp = &sqltds;
-    sqlstm.iters = (unsigned int  )10;
-    sqlstm.offset = (unsigned int  )20;
-    sqlstm.cud = sqlcud0;
-    sqlstm.sqlest = (unsigned char  *)&sqlca;
-    sqlstm.sqlety = (unsigned short)4352;
-    sqlstm.occurs = (unsigned int  )0;
-    sqlstm.sqhstv[0] = (         void  *)&uid;
-    sqlstm.sqhstl[0] = (unsigned int  )82;
-    sqlstm.sqhsts[0] = (         int  )82;
-    sqlstm.sqindv[0] = (         void  *)0;
-    sqlstm.sqinds[0] = (         int  )0;
-    sqlstm.sqharm[0] = (unsigned int  )0;
-    sqlstm.sqadto[0] = (unsigned short )0;
-    sqlstm.sqtdso[0] = (unsigned short )0;
-    sqlstm.sqhstv[1] = (         void  *)&pwd;
-    sqlstm.sqhstl[1] = (unsigned int  )22;
-    sqlstm.sqhsts[1] = (         int  )22;
-    sqlstm.sqindv[1] = (         void  *)0;
-    sqlstm.sqinds[1] = (         int  )0;
-    sqlstm.sqharm[1] = (unsigned int  )0;
-    sqlstm.sqadto[1] = (unsigned short )0;
-    sqlstm.sqtdso[1] = (unsigned short )0;
-    sqlstm.sqphsv = sqlstm.sqhstv;
-    sqlstm.sqphsl = sqlstm.sqhstl;
-    sqlstm.sqphss = sqlstm.sqhsts;
-    sqlstm.sqpind = sqlstm.sqindv;
-    sqlstm.sqpins = sqlstm.sqinds;
-    sqlstm.sqparm = sqlstm.sqharm;
-    sqlstm.sqparc = sqlstm.sqharc;
-    sqlstm.sqpadto = sqlstm.sqadto;
-    sqlstm.sqptdso = sqlstm.sqtdso;
-    sqlstm.sqlcmax = (unsigned int )100;
-    sqlstm.sqlcmin = (unsigned int )2;
-    sqlstm.sqlcincr = (unsigned int )1;
-    sqlstm.sqlctimeout = (unsigned int )0;
-    sqlstm.sqlcnowait = (unsigned int )0;
-    sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-}
-
-
-
-    // connection이 실패했을경우의 처리부분
-
-    if (sqlca.sqlcode != 0 && sqlca.sqlcode != -1405)
-    {
-        printf("Connect error: %s", sqlca.sqlerrm.sqlerrmc);
-        getch();
-        exit(-1);
-    }
-
-    printf("Oracle Connect SUCCESS by %s\n", uid.arr);
+void run(char *userid) {
+    int point = getPoint(userid);
+    getUserInfo(userid, point);
+    productSelect(userid);
 }
 
 
 /**
- * 처음 시작되는 화면
+ * 사용자의 포인트를 가져오는 함수
  */
-void startProcess(){
-    clrscr();
-    print_screen("screen/main_screen.txt");
-    gotoxy(40, 13);
-
-    char input;
-    while ((input = getch())){
-        if (input == '1') { // 로그인을 선택한 경우
-            login();
-            break;
-        }
-        else if (input == '2') { // 회원가입을 선택한 경우 
-            signup();
-            break;
-        } 
-        else {
-            clrscr();
-            print_screen("screen/main_screen.txt");
-            gotoxy(33, 13);
-        }
-    }
-}
-
-/**
- * 회원가입 함수
- */
-void signup(){
-    clrscr();
-    print_screen("screen/signup_screen.txt");
-
-    gotoxy(35, 14);
-
-    /**
-    * Register sql_error() as the error handler. 
-    * DO 뒤에 error시 처리할 handler 함수를 작성 -> 여기서 에러를 캐치해버리면 sqlcode는 무조건 0이 나와버림(?)
-    */
-    /* EXEC SQL WHENEVER SQLERROR DO signup_error(); */ 
-
-
+int getPoint(char *userid)
+{
     // 호스트 변수 선언 (오라클과 값을 주고 받을 때)
     /* EXEC SQL BEGIN DECLARE SECTION; */ 
 
-    /* varchar v_userid[20]; */ 
-struct { unsigned short len; unsigned char arr[20]; } v_userid;
-
-    /* varchar v_password[20]; */ 
-struct { unsigned short len; unsigned char arr[20]; } v_password;
-
-    /* varchar v_name[50]; */ 
-struct { unsigned short len; unsigned char arr[50]; } v_name;
-
-    /* varchar v_address[100]; */ 
-struct { unsigned short len; unsigned char arr[100]; } v_address;
-
+    int n_point;
 
     char dynstmt[1000];
     /* EXEC SQL END DECLARE SECTION; */ 
 
 
-    char userid[20];
-    char password[20];
-    char name[50];
-    char address[100];
+    /* Register sql_error() as the error handler. */
+    /* EXEC SQL WHENEVER SQLERROR DO sql_error("\7ORACLE ERROR:\n"); */ 
 
-    gotoxy(36, 16);
-    gets(userid);
 
-    gotoxy(36, 18);
-    gets(password);
+    /* 실행시킬 SQL 문장*/
+    sprintf(dynstmt, "SELECT point FROM customer WHERE to_char(userid) = '%s'", userid);
 
-    gotoxy(36, 20);
-    gets(name);
-
-    gotoxy(36, 22);
-    gets(address);
-
-    sprintf(dynstmt,"INSERT INTO CUSTOMER VALUES ('%s', '%s', '%s', '%s', %d, sysdate)" , userid, password, name, address, /* 포인트 */0);
-    
-    /**
-     *  실행시킬 SQL 문장
-     *  결과 처리는 COMMIT WORK 이후에 해야 쿼리가 적용이 됨
-     * */
-    /* EXEC SQL EXECUTE IMMEDIATE : dynstmt; */ 
+    // 쿼리문 실행
+    /* EXEC SQL PREPARE S FROM : dynstmt; */ 
 
 {
     struct sqlexd sqlstm;
     sqlstm.sqlvsn = 13;
-    sqlstm.arrsiz = 4;
+    sqlstm.arrsiz = 1;
     sqlstm.sqladtp = &sqladt;
     sqlstm.sqltdsp = &sqltds;
     sqlstm.stmt = "";
     sqlstm.iters = (unsigned int  )1;
-    sqlstm.offset = (unsigned int  )51;
+    sqlstm.offset = (unsigned int  )20;
     sqlstm.cud = sqlcud0;
     sqlstm.sqlest = (unsigned char  *)&sqlca;
     sqlstm.sqlety = (unsigned short)4352;
@@ -413,92 +273,150 @@ struct { unsigned short len; unsigned char arr[100]; } v_address;
     sqlstm.sqpadto = sqlstm.sqadto;
     sqlstm.sqptdso = sqlstm.sqtdso;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) signup_error();
+    if (sqlca.sqlcode < 0) sql_error("\7ORACLE ERROR:\n");
 }
 
 
-    /* EXEC SQL COMMIT WORK; */ 
+
+    /* cursor 선언 */
+    /* EXEC SQL DECLARE c_cursor1 CURSOR FOR S; */ 
+
+
+    /* cursor open */
+    /* EXEC SQL OPEN c_cursor1; */ 
 
 {
     struct sqlexd sqlstm;
     sqlstm.sqlvsn = 13;
-    sqlstm.arrsiz = 4;
+    sqlstm.arrsiz = 1;
+    sqlstm.sqladtp = &sqladt;
+    sqlstm.sqltdsp = &sqltds;
+    sqlstm.stmt = "";
+    sqlstm.iters = (unsigned int  )1;
+    sqlstm.offset = (unsigned int  )39;
+    sqlstm.selerr = (unsigned short)1;
+    sqlstm.sqlpfmem = (unsigned int  )0;
+    sqlstm.cud = sqlcud0;
+    sqlstm.sqlest = (unsigned char  *)&sqlca;
+    sqlstm.sqlety = (unsigned short)4352;
+    sqlstm.occurs = (unsigned int  )0;
+    sqlstm.sqcmod = (unsigned int )0;
+    sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
+    if (sqlca.sqlcode < 0) sql_error("\7ORACLE ERROR:\n");
+}
+
+
+    /* EXEC SQL FETCH c_cursor1 INTO : n_point; */ 
+
+{
+    struct sqlexd sqlstm;
+    sqlstm.sqlvsn = 13;
+    sqlstm.arrsiz = 1;
     sqlstm.sqladtp = &sqladt;
     sqlstm.sqltdsp = &sqltds;
     sqlstm.iters = (unsigned int  )1;
-    sqlstm.offset = (unsigned int  )70;
+    sqlstm.offset = (unsigned int  )54;
+    sqlstm.selerr = (unsigned short)1;
+    sqlstm.sqlpfmem = (unsigned int  )0;
+    sqlstm.cud = sqlcud0;
+    sqlstm.sqlest = (unsigned char  *)&sqlca;
+    sqlstm.sqlety = (unsigned short)4352;
+    sqlstm.occurs = (unsigned int  )0;
+    sqlstm.sqfoff = (           int )0;
+    sqlstm.sqfmod = (unsigned int )2;
+    sqlstm.sqhstv[0] = (         void  *)&n_point;
+    sqlstm.sqhstl[0] = (unsigned int  )sizeof(int);
+    sqlstm.sqhsts[0] = (         int  )0;
+    sqlstm.sqindv[0] = (         void  *)0;
+    sqlstm.sqinds[0] = (         int  )0;
+    sqlstm.sqharm[0] = (unsigned int  )0;
+    sqlstm.sqadto[0] = (unsigned short )0;
+    sqlstm.sqtdso[0] = (unsigned short )0;
+    sqlstm.sqphsv = sqlstm.sqhstv;
+    sqlstm.sqphsl = sqlstm.sqhstl;
+    sqlstm.sqphss = sqlstm.sqhsts;
+    sqlstm.sqpind = sqlstm.sqindv;
+    sqlstm.sqpins = sqlstm.sqinds;
+    sqlstm.sqparm = sqlstm.sqharm;
+    sqlstm.sqparc = sqlstm.sqharc;
+    sqlstm.sqpadto = sqlstm.sqadto;
+    sqlstm.sqptdso = sqlstm.sqtdso;
+    sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
+    if (sqlca.sqlcode < 0) sql_error("\7ORACLE ERROR:\n");
+}
+
+
+
+    /* Close the cursor. */
+    /* EXEC SQL CLOSE c_cursor1; */ 
+
+{
+    struct sqlexd sqlstm;
+    sqlstm.sqlvsn = 13;
+    sqlstm.arrsiz = 1;
+    sqlstm.sqladtp = &sqladt;
+    sqlstm.sqltdsp = &sqltds;
+    sqlstm.iters = (unsigned int  )1;
+    sqlstm.offset = (unsigned int  )73;
     sqlstm.cud = sqlcud0;
     sqlstm.sqlest = (unsigned char  *)&sqlca;
     sqlstm.sqlety = (unsigned short)4352;
     sqlstm.occurs = (unsigned int  )0;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) signup_error();
+    if (sqlca.sqlcode < 0) sql_error("\7ORACLE ERROR:\n");
 }
 
 
 
-    gotoxy(34, 24);
-    printf("## SignUp Success ##");
-    getch();
-
-    // 메인화면으로 돌아가기
-    startProcess();
-
-    return;
+    return n_point;
 }
 
-/**
- * 회원가입 오류 처리 함수
-*/
-void signup_error(){
-    sql_error("\7ORACLE ERROR:\n");
-    getch();
-
-    signup();
-    return;
-}
-
-/**
- * 로그인 함수
- */
-void login()
+void getUserInfo(char *userid, int point)
 {
+    int x, y = 0;
     clrscr();
-    print_screen("screen/login_screen.txt");
+    print_screen("screen/product_menu_screen.txt");
 
+    // 사용자 부분에 커서 이동
+    x = 40;
+    y = 29;
+    gotoxy(x, y);
+    printf(" %10s", userid);
+
+    x = 71;
+    y = 29;
+    gotoxy(x, y);
+    printf("%d", point);
+}
+
+#define PAGE_NUM 5
+void productSelect(char *userid)
+{
     // 호스트 변수 선언 (오라클과 값을 주고 받을 때)
     /* EXEC SQL BEGIN DECLARE SECTION; */ 
 
-    /* varchar v_userid[100]; */ 
-struct { unsigned short len; unsigned char arr[100]; } v_userid;
+    /* varchar v_name[50]; */ 
+struct { unsigned short len; unsigned char arr[50]; } v_name;
 
-    /* varchar v_password[100]; */ 
-struct { unsigned short len; unsigned char arr[100]; } v_password;
-
+    int v_price;
+    int v_id; // product id
 
     char dynstmt[1000];
     /* EXEC SQL END DECLARE SECTION; */ 
 
 
-    char userid[20];
-    char password[20];
+    char name[20];
+    int price;
+    int id;
+
+    int x, y, count = 0, i;
 
     /* Register sql_error() as the error handler. */
     /* EXEC SQL WHENEVER SQLERROR DO sql_error("\7ORACLE ERROR:\n"); */ 
 
 
-    gotoxy(42, 16);
-    gets(userid);
-
-    gotoxy(42, 18);
-    gets(password);
-
     /* 실행시킬 SQL 문장*/
-    sprintf(dynstmt, "SELECT userid, password FROM customer WHERE to_char(userid) = '%s' AND to_char(password) = '%s'",
-            userid, password);
-
-    /* select 문장이 제대로 구성되어 있는지 화면에 찍어봄 */
-    // printf("dynstmt:%s\n", dynstmt);
+    sprintf(dynstmt, "SELECT id, name, price FROM products ORDER BY id");
 
     // 쿼리문 실행
     /* EXEC SQL PREPARE S FROM : dynstmt; */ 
@@ -506,12 +424,12 @@ struct { unsigned short len; unsigned char arr[100]; } v_password;
 {
     struct sqlexd sqlstm;
     sqlstm.sqlvsn = 13;
-    sqlstm.arrsiz = 4;
+    sqlstm.arrsiz = 1;
     sqlstm.sqladtp = &sqladt;
     sqlstm.sqltdsp = &sqltds;
     sqlstm.stmt = "";
     sqlstm.iters = (unsigned int  )1;
-    sqlstm.offset = (unsigned int  )85;
+    sqlstm.offset = (unsigned int  )88;
     sqlstm.cud = sqlcud0;
     sqlstm.sqlest = (unsigned char  *)&sqlca;
     sqlstm.sqlety = (unsigned short)4352;
@@ -549,12 +467,12 @@ struct { unsigned short len; unsigned char arr[100]; } v_password;
 {
     struct sqlexd sqlstm;
     sqlstm.sqlvsn = 13;
-    sqlstm.arrsiz = 4;
+    sqlstm.arrsiz = 1;
     sqlstm.sqladtp = &sqladt;
     sqlstm.sqltdsp = &sqltds;
     sqlstm.stmt = "";
     sqlstm.iters = (unsigned int  )1;
-    sqlstm.offset = (unsigned int  )104;
+    sqlstm.offset = (unsigned int  )107;
     sqlstm.selerr = (unsigned short)1;
     sqlstm.sqlpfmem = (unsigned int  )0;
     sqlstm.cud = sqlcud0;
@@ -567,20 +485,23 @@ struct { unsigned short len; unsigned char arr[100]; } v_password;
 }
 
 
+
+    x = 16;
+    y = 14;
+
+    // 전부 조회해서 출력
     for (;;)
     {
-        /* EXEC SQL WHENEVER NOT FOUND DO break; */ 
-
-        /* EXEC SQL FETCH c_cursor INTO : v_userid, : v_password; */ 
+        /* EXEC SQL FETCH c_cursor INTO : v_id, : v_name, : v_price; */ 
 
 {
         struct sqlexd sqlstm;
         sqlstm.sqlvsn = 13;
-        sqlstm.arrsiz = 4;
+        sqlstm.arrsiz = 3;
         sqlstm.sqladtp = &sqladt;
         sqlstm.sqltdsp = &sqltds;
         sqlstm.iters = (unsigned int  )1;
-        sqlstm.offset = (unsigned int  )119;
+        sqlstm.offset = (unsigned int  )122;
         sqlstm.selerr = (unsigned short)1;
         sqlstm.sqlpfmem = (unsigned int  )0;
         sqlstm.cud = sqlcud0;
@@ -589,22 +510,30 @@ struct { unsigned short len; unsigned char arr[100]; } v_password;
         sqlstm.occurs = (unsigned int  )0;
         sqlstm.sqfoff = (           int )0;
         sqlstm.sqfmod = (unsigned int )2;
-        sqlstm.sqhstv[0] = (         void  *)&v_userid;
-        sqlstm.sqhstl[0] = (unsigned int  )102;
+        sqlstm.sqhstv[0] = (         void  *)&v_id;
+        sqlstm.sqhstl[0] = (unsigned int  )sizeof(int);
         sqlstm.sqhsts[0] = (         int  )0;
         sqlstm.sqindv[0] = (         void  *)0;
         sqlstm.sqinds[0] = (         int  )0;
         sqlstm.sqharm[0] = (unsigned int  )0;
         sqlstm.sqadto[0] = (unsigned short )0;
         sqlstm.sqtdso[0] = (unsigned short )0;
-        sqlstm.sqhstv[1] = (         void  *)&v_password;
-        sqlstm.sqhstl[1] = (unsigned int  )102;
+        sqlstm.sqhstv[1] = (         void  *)&v_name;
+        sqlstm.sqhstl[1] = (unsigned int  )52;
         sqlstm.sqhsts[1] = (         int  )0;
         sqlstm.sqindv[1] = (         void  *)0;
         sqlstm.sqinds[1] = (         int  )0;
         sqlstm.sqharm[1] = (unsigned int  )0;
         sqlstm.sqadto[1] = (unsigned short )0;
         sqlstm.sqtdso[1] = (unsigned short )0;
+        sqlstm.sqhstv[2] = (         void  *)&v_price;
+        sqlstm.sqhstl[2] = (unsigned int  )sizeof(int);
+        sqlstm.sqhsts[2] = (         int  )0;
+        sqlstm.sqindv[2] = (         void  *)0;
+        sqlstm.sqinds[2] = (         int  )0;
+        sqlstm.sqharm[2] = (unsigned int  )0;
+        sqlstm.sqadto[2] = (unsigned short )0;
+        sqlstm.sqtdso[2] = (unsigned short )0;
         sqlstm.sqphsv = sqlstm.sqhstv;
         sqlstm.sqphsl = sqlstm.sqhstl;
         sqlstm.sqphss = sqlstm.sqhsts;
@@ -615,44 +544,112 @@ struct { unsigned short len; unsigned char arr[100]; } v_password;
         sqlstm.sqpadto = sqlstm.sqadto;
         sqlstm.sqptdso = sqlstm.sqtdso;
         sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode == 1403) break;
         if (sqlca.sqlcode < 0) sql_error("\7ORACLE ERROR:\n");
 }
 
 
+        if (sqlca.sqlcode == 1403)     break;
 
-        v_userid.arr[v_userid.len] = '\0';
-        v_password.arr[v_password.len] = '\0';
+        v_name.arr[v_name.len] = '\0';
+
+        gotoxy(x, y);
+
+        printf(" [ %4d  ]        | %20s   |     |   $%8d   |", v_id, v_name.arr, v_price);
+        y = y + 2;
+        count++;
+
+        // 하나씩 출력하다가 페이지 수랑 같아지면 멈춤 (입력 기다림)
+        if (count == PAGE_NUM)
+        {
+
+            count = 0;
+            char input;
+            /**
+             * n 또는 x가 가능한 입력 (가능한 입력이 아니면 아무 동작 하지 않음)
+             * 이렇게하면 한 화면에서 여러 입력을 처리할 수 있음
+             */
+            while ((input = getch()) != 'n' && input != 'x')
+                ;
+
+            // 입력으로 n가 들어온 경우
+            if (input == 'n')
+            {
+                gotoxy(16, 14); // 이전 화면 부분 클리어
+                for (i = 0; i < PAGE_NUM * 2; i++)
+                {
+                    printf("                                                                                    \n");
+                }
+
+                y = 14;
+            }
+            // 입력으로 x가 들어온 경우
+            else if (input == 'x')
+            {
+                mainmenu_main(userid);
+                return;
+            }
+        }
     }
+    gotoxy(x, 22);
+    printf("                              (END)\n");
 
-    // 찾은 튜플의 수가 0인 경우 (로그인 실패)
-    
-    if (sqlca.sqlerrd[2] == 0)
-    {
-        gotoxy(31, 21);
-        printf("## Not Found id or password ##");
-        getch();
+    int productCode = 0;
+    gotoxy(45, 25);
+    scanf("%d", &productCode);
 
-        login();
-        return;
-    } else {
-        gotoxy(36, 20);
-        printf("## Login Success ##");
-        clrscr();
-        mainmenu_main(userid); 
-    }
+    int num;
+    gotoxy(71, 25);
+    scanf("%d", &num);
 
-    /* Close the cursor. */
-    /* EXEC SQL CLOSE c_cursor; */ 
+    sprintf(dynstmt, "INSERT INTO orders VALUES (orders_seq.NEXTVAL, %d, %d, '%s', sysdate)", num, productCode, userid);
+
+    /* EXEC SQL EXECUTE IMMEDIATE : dynstmt; */ 
 
 {
     struct sqlexd sqlstm;
     sqlstm.sqlvsn = 13;
-    sqlstm.arrsiz = 4;
+    sqlstm.arrsiz = 3;
+    sqlstm.sqladtp = &sqladt;
+    sqlstm.sqltdsp = &sqltds;
+    sqlstm.stmt = "";
+    sqlstm.iters = (unsigned int  )1;
+    sqlstm.offset = (unsigned int  )149;
+    sqlstm.cud = sqlcud0;
+    sqlstm.sqlest = (unsigned char  *)&sqlca;
+    sqlstm.sqlety = (unsigned short)4352;
+    sqlstm.occurs = (unsigned int  )0;
+    sqlstm.sqhstv[0] = (         void  *)dynstmt;
+    sqlstm.sqhstl[0] = (unsigned int  )1000;
+    sqlstm.sqhsts[0] = (         int  )0;
+    sqlstm.sqindv[0] = (         void  *)0;
+    sqlstm.sqinds[0] = (         int  )0;
+    sqlstm.sqharm[0] = (unsigned int  )0;
+    sqlstm.sqadto[0] = (unsigned short )0;
+    sqlstm.sqtdso[0] = (unsigned short )0;
+    sqlstm.sqphsv = sqlstm.sqhstv;
+    sqlstm.sqphsl = sqlstm.sqhstl;
+    sqlstm.sqphss = sqlstm.sqhsts;
+    sqlstm.sqpind = sqlstm.sqindv;
+    sqlstm.sqpins = sqlstm.sqinds;
+    sqlstm.sqparm = sqlstm.sqharm;
+    sqlstm.sqparc = sqlstm.sqharc;
+    sqlstm.sqpadto = sqlstm.sqadto;
+    sqlstm.sqptdso = sqlstm.sqtdso;
+    sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
+    if (sqlca.sqlcode < 0) sql_error("\7ORACLE ERROR:\n");
+}
+
+
+    /* EXEC SQL COMMIT WORK; */ 
+
+{
+    struct sqlexd sqlstm;
+    sqlstm.sqlvsn = 13;
+    sqlstm.arrsiz = 3;
     sqlstm.sqladtp = &sqladt;
     sqlstm.sqltdsp = &sqltds;
     sqlstm.iters = (unsigned int  )1;
-    sqlstm.offset = (unsigned int  )142;
+    sqlstm.offset = (unsigned int  )168;
     sqlstm.cud = sqlcud0;
     sqlstm.sqlest = (unsigned char  *)&sqlca;
     sqlstm.sqlety = (unsigned short)4352;
@@ -662,44 +659,30 @@ struct { unsigned short len; unsigned char arr[100]; } v_password;
 }
 
 
-}
 
-/* --------------------------------------------------------------------------
-int sql_error()
-
-   errrpt prints the ORACLE error msg and number.
--------------------------------------------------------------------------- */
-void sql_error(char* msg)
-{
-    char err_msg[128];
-    size_t buf_len, msg_len;
-
-    /* EXEC SQL WHENEVER SQLERROR CONTINUE; */ 
-
-
-    printf("\n%s\n", msg);
-    buf_len = sizeof(err_msg);
-    sqlglm(err_msg, &buf_len, &msg_len);
-    printf("%.*s\n", msg_len, err_msg);
-
-    getch();
-    /* EXEC SQL ROLLBACK WORK; */ 
+    /* Close the cursor. */
+    /* EXEC SQL CLOSE c_cursor; */ 
 
 {
     struct sqlexd sqlstm;
     sqlstm.sqlvsn = 13;
-    sqlstm.arrsiz = 4;
+    sqlstm.arrsiz = 3;
     sqlstm.sqladtp = &sqladt;
     sqlstm.sqltdsp = &sqltds;
     sqlstm.iters = (unsigned int  )1;
-    sqlstm.offset = (unsigned int  )157;
+    sqlstm.offset = (unsigned int  )183;
     sqlstm.cud = sqlcud0;
     sqlstm.sqlest = (unsigned char  *)&sqlca;
     sqlstm.sqlety = (unsigned short)4352;
     sqlstm.occurs = (unsigned int  )0;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
+    if (sqlca.sqlcode < 0) sql_error("\7ORACLE ERROR:\n");
 }
 
 
-    // exit(EXIT_FAILURE);
+
+    printf("## order Success ##");
+    getch();
+
+    run(userid);
 }
