@@ -20,7 +20,7 @@ void mainmenu_main(char *userid){
     while (input = getch())
     {
         if (input == '1') { // 상품 조회 메뉴
-            productmenu_main();
+            productmenu_main(userid);
             break;
         }
         else if (input == '2') { // 상품 구매 내역 조회 메뉴
