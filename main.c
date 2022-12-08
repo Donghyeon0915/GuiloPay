@@ -629,7 +629,7 @@ struct { unsigned short len; unsigned char arr[100]; } v_password;
     } else {
         printf("## Login Success ##");
         clrscr();
-        mainmenu_main(userid);
+        mainmenu_main(userid); 
     }
 
     /* Close the cursor. */

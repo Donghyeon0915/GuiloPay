@@ -230,7 +230,7 @@ void login()
     } else {
         printf("## Login Success ##");
         clrscr();
-        mainmenu_main(userid);
+        mainmenu_main(userid); 
     }
 
     /* Close the cursor. */
