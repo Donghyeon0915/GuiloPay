@@ -15,22 +15,22 @@ void mainmenu_main(char *userid){
 
     gotoxy(29, 13);
 
-    char input = getch();
-
-    if (input == '1') // 상품 조회 메뉴
-    { 
-        productmenu_main();
-    }
-    else if (input == '2') // 상품 구매 내역 조회 메뉴
-    { 
-        
-    }
-    else if(input == '3') // 포인트 조회 메뉴
+    char input;
+    while (input = getch())
     {
-        pointmenu_main(userid);   
-    }
-    else if(input == '4') // 로그아웃 메뉴
-    {
-        startProcess();
+        if (input == '1') { // 상품 조회 메뉴
+            productmenu_main();
+            break;
+        }
+        else if (input == '2') { // 상품 구매 내역 조회 메뉴
+        }
+        else if (input == '3')  { // 포인트 조회 메뉴
+            pointmenu_main(userid);
+            break;
+        }
+        else if (input == '4') { // 로그아웃 메뉴
+            startProcess();
+            break;
+        }
     }
 }
