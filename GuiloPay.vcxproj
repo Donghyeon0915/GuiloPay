@@ -30,6 +30,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="screenHandler\screenHandler.c" />
+    <ClCompile Include="mainmenu\purchase_history\purchase_history.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainmenu\mainmenu.h" />

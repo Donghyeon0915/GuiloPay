@@ -22,6 +22,8 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="screenHandler\screenHandler.c">
+    <ClCompile Include="mainmenu\purchase_history\purchase_history.c">
+
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
