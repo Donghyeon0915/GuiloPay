@@ -135,12 +135,12 @@ typedef struct { unsigned short len; unsigned char arr[1]; } varchar;
 /* cud (compilation unit data) array */
 static const short sqlcud0[] =
 {13,4130,1,0,0,
-5,0,0,1,0,0,17,56,0,0,1,1,0,1,0,1,97,0,0,
-24,0,0,1,0,0,45,62,0,0,0,0,0,1,0,
-39,0,0,1,0,0,13,63,0,0,1,0,0,1,0,2,3,0,0,
-58,0,0,1,0,0,15,69,0,0,0,0,0,1,0,
-73,0,0,2,0,0,24,114,0,0,1,1,0,1,0,1,97,0,0,
-92,0,0,3,0,0,29,115,0,0,0,0,0,1,0,
+5,0,0,1,0,0,17,60,0,0,1,1,0,1,0,1,97,0,0,
+24,0,0,1,0,0,45,66,0,0,0,0,0,1,0,
+39,0,0,1,0,0,13,67,0,0,1,0,0,1,0,2,3,0,0,
+58,0,0,1,0,0,15,73,0,0,0,0,0,1,0,
+73,0,0,2,0,0,24,118,0,0,1,1,0,1,0,1,97,0,0,
+92,0,0,3,0,0,29,119,0,0,0,0,0,1,0,
 };
 
 
@@ -148,6 +148,7 @@ static const short sqlcud0[] =
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
 /* for oracle */
 #include <sqlda.h>
@@ -155,6 +156,7 @@ static const short sqlcud0[] =
 #include <sqlcpr.h>
 
 #include "../../screenHandler/screenHandler.h"
+#include "../../mainmenu/mainmenu.h"
 
 #define ADD_POINT 1
 #define REFUND_POINT -1
@@ -178,6 +180,8 @@ void pointmenu_main(char* userid){
         managePoint(userid, point, ADD_POINT);
     } else if(input == '2') { // 포인트 반환
         managePoint(userid, point, REFUND_POINT);
+    } else if(input == 'x'){
+        mainmenu_main(userid);
     }
 }
 

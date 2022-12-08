@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
 /* for oracle */
 #include <sqlda.h>
@@ -9,6 +10,7 @@
 #include <sqlcpr.h>
 
 #include "../../screenHandler/screenHandler.h"
+#include "../../mainmenu/mainmenu.h"
 
 #define ADD_POINT 1
 #define REFUND_POINT -1
@@ -32,6 +34,8 @@ void pointmenu_main(char* userid){
         managePoint(userid, point, ADD_POINT);
     } else if(input == '2') { // 포인트 반환
         managePoint(userid, point, REFUND_POINT);
+    } else if(input == 'x'){
+        mainmenu_main(userid);
     }
 }
 

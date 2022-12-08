@@ -137,13 +137,13 @@ static const short sqlcud0[] =
 {13,4130,1,0,0,
 5,0,0,1,0,0,30,52,0,0,0,0,0,1,0,
 20,0,0,0,0,0,27,64,0,0,4,4,0,1,0,1,9,0,0,1,9,0,0,1,10,0,0,1,10,0,0,
-51,0,0,3,0,0,24,144,0,0,1,1,0,1,0,1,97,0,0,
-70,0,0,4,0,0,29,145,0,0,0,0,0,1,0,
-85,0,0,5,0,0,17,205,0,0,1,1,0,1,0,1,97,0,0,
-104,0,0,5,0,0,45,211,0,0,0,0,0,1,0,
-119,0,0,5,0,0,13,215,0,0,2,0,0,1,0,2,9,0,0,2,9,0,0,
-142,0,0,5,0,0,15,237,0,0,0,0,0,1,0,
-157,0,0,6,0,0,31,258,0,0,0,0,0,1,0,
+51,0,0,3,0,0,24,156,0,0,1,1,0,1,0,1,97,0,0,
+70,0,0,4,0,0,29,157,0,0,0,0,0,1,0,
+85,0,0,5,0,0,17,216,0,0,1,1,0,1,0,1,97,0,0,
+104,0,0,5,0,0,45,222,0,0,0,0,0,1,0,
+119,0,0,5,0,0,13,226,0,0,2,0,0,1,0,2,9,0,0,2,9,0,0,
+142,0,0,5,0,0,15,250,0,0,0,0,0,1,0,
+157,0,0,6,0,0,31,271,0,0,0,0,0,1,0,
 };
 
 
@@ -303,12 +303,24 @@ void startProcess(){
     print_screen("screen/main_screen.txt");
     gotoxy(33, 13);
 
-    char input = getch();
-
-    if(input == '1'){ // 로그인을 선택한 경우
-        login();
-    } else if(input == '2'){ // 회원가입을 선택한 경우
-        signup();
+    char input;
+    while ((input = getch())){
+        if (input == '1') { // 로그인을 선택한 경우
+            login();
+            break;
+        }
+        else if (input == '2') { // 회원가입을 선택한 경우 
+            signup();
+            break;
+        } 
+        else if (input == 6){
+            exit(1);
+        }
+        else {
+            clrscr();
+            print_screen("screen/main_screen.txt");
+            gotoxy(33, 13);
+        }
     }
 }
 
@@ -353,16 +365,16 @@ struct { unsigned short len; unsigned char arr[100]; } v_address;
     char name[50];
     char address[100];
 
-    gotoxy(35, 14);
+    gotoxy(36, 16);
     gets(userid);
 
-    gotoxy(35, 16);
+    gotoxy(36, 18);
     gets(password);
 
-    gotoxy(35, 18);
+    gotoxy(36, 20);
     gets(name);
 
-    gotoxy(35, 20);
+    gotoxy(36, 22);
     gets(address);
 
     sprintf(dynstmt,"INSERT INTO CUSTOMER VALUES ('%s', '%s', '%s', '%s', %d, sysdate)" , userid, password, name, address, /* 포인트 */0);
@@ -428,6 +440,7 @@ struct { unsigned short len; unsigned char arr[100]; } v_address;
 
 
 
+    gotoxy(34, 24);
     printf("## SignUp Success ##");
     getch();
 
@@ -477,12 +490,10 @@ struct { unsigned short len; unsigned char arr[100]; } v_password;
     /* EXEC SQL WHENEVER SQLERROR DO sql_error("\7ORACLE ERROR:\n"); */ 
 
 
-    gotoxy(35, 12);
-    // printf("찾을 사람의 사원번호를 입력하세요:");
+    gotoxy(42, 16);
     gets(userid);
 
-    gotoxy(35, 14);
-    // printf("찾을 사람의 이름을 입력하세요:");
+    gotoxy(42, 18);
     gets(password);
 
     /* 실행시킬 SQL 문장*/
@@ -618,15 +629,17 @@ struct { unsigned short len; unsigned char arr[100]; } v_password;
     }
 
     // 찾은 튜플의 수가 0인 경우 (로그인 실패)
-    gotoxy(24, 16);
+    
     if (sqlca.sqlerrd[2] == 0)
     {
+        gotoxy(31, 21);
         printf("## Not Found id or password ##");
         getch();
 
         login();
         return;
     } else {
+        gotoxy(36, 20);
         printf("## Login Success ##");
         clrscr();
         mainmenu_main(userid); 
