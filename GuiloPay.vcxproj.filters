@@ -15,16 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="sample\select_xy.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="main.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="screenHandler\screenHandler.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="mainmenu\mainmenu.c">
+    <ClCompile Include="mainmenu\purchase_history\purchase_history.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
